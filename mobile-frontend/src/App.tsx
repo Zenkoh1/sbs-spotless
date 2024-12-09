@@ -18,8 +18,9 @@ import {
   Link as RouterLink,
 } from "react-router-dom";
 import { logoutUser, getName, loginUserWithToken } from "./api/sessionManager";
-import Homepage from "./pages/Homepage";
+import Dashboardpage from "./pages/Dashboardpage";
 import { createTheme, responsiveFontSizes } from "@mui/material/styles";
+import Buspage from "./pages/Buspage";
 
 type AuthContextType = {
   isAuth: boolean;
@@ -127,7 +128,8 @@ function App() {
               </Toolbar>
             </AppBar>
             <Routes>
-              <Route path="/" element={<Homepage />} />
+              <Route path="/dashboard" element={<Dashboardpage />} />
+              <Route path="dashboard/bus/:id" element={<Buspage />} />
               <Route path="/login" element={<Loginpage />} />
               <Route path="/register" element={<Registerpage />} />
             </Routes>
