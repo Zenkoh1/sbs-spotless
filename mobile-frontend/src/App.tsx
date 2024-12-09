@@ -26,7 +26,10 @@ type AuthContextType = {
   setIsAuth: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export const AuthContext = createContext<AuthContextType>({isAuth: false, setIsAuth: () => {}});
+export const AuthContext = createContext<AuthContextType>({
+  isAuth: false,
+  setIsAuth: () => {},
+});
 
 function App() {
   useEffect(() => {
@@ -41,7 +44,8 @@ function App() {
       .then(() => setIsAuth(true))
       .catch(() => {
         setIsAuth(false);
-      }).finally(() => {
+      })
+      .finally(() => {
         setLoading(false);
       });
   }, [isAuth]);

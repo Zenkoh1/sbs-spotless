@@ -12,7 +12,6 @@ import { AuthContext } from "../App";
 import { getID } from "../api/sessionManager";
 
 const Homepage = () => {
-  
   // This doenst actually do anything now
   // I'll leave it here for reference
   const { fetchAPI, loading, data } = useAPI(`test`, {
@@ -22,10 +21,10 @@ const Homepage = () => {
   });
 
   const { isAuth } = useContext(AuthContext);
-  
+
   useEffect(() => {
     if (isAuth) {
-        //fetchAPI();
+      //fetchAPI();
     }
   }, [isAuth]);
 

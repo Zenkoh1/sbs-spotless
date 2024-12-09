@@ -34,10 +34,10 @@ const Registerpage = () => {
         });
       })
       .catch((error) => {
-        alert("Error registering user, check if email is unique");
+        alert(error);
+        // alert("Error registering user, check if email is unique");
       });
   };
-  
 
   return (
     <Box width="50vw" display="inline-block">
