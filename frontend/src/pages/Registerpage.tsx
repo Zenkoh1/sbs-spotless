@@ -5,6 +5,12 @@ import FormTextField from "../components/FormTextField";
 import { loginUser, registerUser } from "../api/sessionManager";
 import { AuthContext } from "../App";
 
+/* -------------------------------------- */
+/* This file is not used, user should not */
+/* be able to self register. This is kept */
+/* for reference                          */
+/* -------------------------------------- */
+
 const Registerpage = () => {
   const [email, setEmail] = useState("");
   const [username, setUsername] = useState("");

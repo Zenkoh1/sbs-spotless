@@ -1,13 +1,7 @@
 import "./App.css";
 import React, { useEffect, useState, createContext } from "react";
-import Loginpage from "./pages/Loginpage";
-import Registerpage from "./pages/Registerpage";
 import {
-  AppBar,
-  Button,
-  Toolbar,
   Stack,
-  Typography,
   ThemeProvider,
   CircularProgress,
 } from "@mui/material";
@@ -15,11 +9,14 @@ import {
   Routes,
   Route,
   BrowserRouter,
-  Link as RouterLink,
 } from "react-router-dom";
-import { logoutUser, getName, loginUserWithToken } from "./api/sessionManager";
-import Homepage from "./pages/Homepage";
+import { loginUserWithToken } from "./api/sessionManager";
 import { createTheme, responsiveFontSizes } from "@mui/material/styles";
+
+import Login from "./pages/Login";
+import Registerpage from "./pages/Registerpage";
+import HomePage from "./pages/HomePage";
+import { Navbar } from "./components/Navbar";
 
 type AuthContextType = {
   isAuth: boolean;
@@ -29,9 +26,6 @@ type AuthContextType = {
 export const AuthContext = createContext<AuthContextType>({isAuth: false, setIsAuth: () => {}});
 
 function App() {
-  useEffect(() => {
-    document.title = "Spotless";
-  }, []);
   const [isAuth, setIsAuth] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -40,7 +34,7 @@ function App() {
     loginUserWithToken(accessToken)
       .then(() => setIsAuth(true))
       .catch(() => {
-        setIsAuth(false);
+        setIsAuth(true); // FIXME: Set to true for testing
       }).finally(() => {
         setLoading(false);
       });
@@ -50,82 +44,40 @@ function App() {
   let theme = createTheme();
   theme = responsiveFontSizes(theme);
 
-  if (loading)
+  if (loading) {
     return (
       <Stack alignItems="center">
+        <title>Loading...</title>
         <CircularProgress />
       </Stack>
     );
+  }
+
+  if (!isAuth) {
+    return (
+      <ThemeProvider theme={theme}>
+        <AuthContext.Provider value={{ isAuth, setIsAuth }}>
+          <div className="App">
+            <title>Login</title>
+            <BrowserRouter>
+              <Login />
+            </BrowserRouter>
+          </div>
+      </AuthContext.Provider>
+    </ThemeProvider>
+    )
+  }
 
   return (
     <ThemeProvider theme={theme}>
       <AuthContext.Provider value={{ isAuth, setIsAuth }}>
         <div className="App">
+          <title>Spotless</title>
           <BrowserRouter>
-            <AppBar position="static" elevation={0}>
-              <Toolbar
-                style={{ display: "flex", justifyContent: "space-between" }}
-              >
-                <Stack spacing={2} direction="row" alignItems="center">
-                  <Typography
-                    sx={{ textDecoration: "none", fontWeight: "bold" }}
-                    variant="h5"
-                    color="inherit"
-                    component={RouterLink}
-                    to="/"
-                  >
-                    Spotless
-                  </Typography>
-                  {isAuth && (
-                    <Typography variant="h6">Welcome {getName()}!</Typography>
-                  )}
-                </Stack>
-                <div>
-                  {!isAuth ? (
-                    <Stack spacing={2} direction="row">
-                      <Button
-                        className="Button"
-                        variant="contained"
-                        color="secondary"
-                        component={RouterLink}
-                        to="/login"
-                      >
-                        Login
-                      </Button>
-                      <Button
-                        className="Button"
-                        variant="contained"
-                        color="secondary"
-                        component={RouterLink}
-                        to="/register"
-                      >
-                        Register
-                      </Button>
-                    </Stack>
-                  ) : (
-                    <Stack spacing={2} direction="row">
-                      <Button
-                        variant="contained"
-                        color="secondary"
-                        onClick={() => {
-                          logoutUser()
-                            .then(() => setIsAuth(false))
-                            .catch(() => {
-                              alert("Error logging out, refresh the page!");
-                            });
-                        }}
-                      >
-                        Logout
-                      </Button>
-                    </Stack>
-                  )}
-                </div>
-              </Toolbar>
-            </AppBar>
+            <Navbar />
             <Routes>
-              <Route path="/" element={<Homepage />} />
-              <Route path="/login" element={<Loginpage />} />
-              <Route path="/register" element={<Registerpage />} />
+              <Route path="/" element={<HomePage />} />
+              <Route path="/login" element={<Login />} />
             </Routes>
           </BrowserRouter>
         </div>

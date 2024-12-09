@@ -19,7 +19,6 @@ const state = {
 
 export function loginUser({email, password}: {email: string, password: string}): Promise<any> {
   return axios.post(`${BACKEND_URL}login`, { email, password }).then((response) => {
-       
         const data = response.data;
         state.id = data.id;
         state.name = data.name;
