@@ -120,7 +120,8 @@ const Dashboardpage = () => {
                 return (
                   <Button
                     key={schedule.bus_id}
-                    onClick={() => navigate(`/bus/${schedule.bus_id}`)}
+                    component={RouterLink}
+                    to={`bus/${schedule.bus_id}`}
                   >
                     {schedule.bus_id}
                   </Button>
