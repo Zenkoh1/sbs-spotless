@@ -22,6 +22,7 @@ import Dashboardpage from "./pages/Dashboardpage";
 import { createTheme, responsiveFontSizes } from "@mui/material/styles";
 import Buspage from "./pages/Buspage";
 import { BusProvider } from "./context/busContext";
+import Scanpage from "./pages/Scanpage";
 
 type AuthContextType = {
   isAuth: boolean;
@@ -134,6 +135,7 @@ function App() {
                 <Route path="dashboard/bus/:id" element={<Buspage />} />
                 <Route path="/login" element={<Loginpage />} />
                 <Route path="/register" element={<Registerpage />} />
+                <Route path="/scan" element={<Scanpage />} />
               </Routes>
             </BrowserRouter>
           </div>
