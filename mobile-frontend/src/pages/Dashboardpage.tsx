@@ -67,36 +67,47 @@ const Dashboardpage = () => {
     }
   );
 
-  // const { buses, setBuses, markBus } = useBuses();
-  const [schedule, setSchedule] = useState<CleaningScheduleType[]>([]);
+  const [scheduleItem, setScheduleItem] = useState<CleaningScheduleType[]>([]);
 
   useEffect(() => {
     if (!isAuth) {
       console.log("Not authenticated");
       navigate("/login");
     }
+
     console.log("Fetching schedule");
-    // fetchAPI();
 
-    setSchedule(
-      sampleData.map((schedule) => ({
-        ...schedule,
-        date: new Date(schedule.date),
-      }))
-    );
+    const rawData: CleaningScheduleBackendType[] = sampleData;
+
+    // Group bus IDs by date
+    const map = new Map<string, number[]>();
+    for (let i = 0; i < rawData.length; i++) {
+      const schedule = rawData[i];
+      if (map.has(schedule.date)) {
+        map.get(schedule.date)?.push(schedule.bus_id);
+      } else {
+        map.set(schedule.date, [schedule.bus_id]);
+      }
+    }
+
+    console.log(map);
+
+    const formattedData: CleaningScheduleType[] = [];
+    for (const date of map.keys()) {
+      formattedData.push({
+        id: 0,
+        user_id: 0,
+        status: false,
+        date: new Date(date),
+        bus_ids: map.get(date) || [],
+      });
+    }
+
+    console.log(formattedData);
+
+    // Update the state with the transformed data
+    setScheduleItem(formattedData);
   }, [isAuth]);
-
-  // should display a schedule of buses to be cleaned in each day
-  // example:
-  // 10 dec 2024 (today)
-  // KCB 123 clickable
-  // KCB 124 clickable
-  // 11 dec 2024
-  // KCB 125 not clickable
-  // KCB 126 not clickable
-
-  // only show buses to be cleaned today and in the future
-  // blank out the buses not to be cleaned today
 
   return (
     <Box display="inline-block" width="75vw">
@@ -111,30 +122,43 @@ const Dashboardpage = () => {
         <Box>
           <Typography variant="h5">Schedule</Typography>
           <Stack>
-            {schedule.map((schedule) => {
+            {scheduleItem.map((item) => {
               const today = getStartOfDay(new Date());
               const tomorrow = new Date(
                 new Date().setDate(today.getDate() + 1)
               );
-              if (schedule.date > today && schedule.date < tomorrow) {
+              if (item.date > today && item.date < tomorrow) {
                 return (
-                  <Button
-                    key={schedule.bus_id}
-                    component={RouterLink}
-                    to={`bus/${schedule.bus_id}`}
-                  >
-                    {schedule.bus_id}
-                  </Button>
+                  <>
+                    <Typography>{item.date.toString()}</Typography>
+                    <Stack>
+                      {item.bus_ids.map((bus_id) => {
+                        return (
+                          <Button
+                            key={bus_id}
+                            onClick={() => navigate(`bus/${bus_id}`)}
+                          >
+                            {bus_id}
+                          </Button>
+                        );
+                      })}
+                    </Stack>
+                  </>
                 );
-              } else if (schedule.date > today) {
+              } else if (item.date > today) {
                 return (
-                  <Button
-                    key={schedule.bus_id}
-                    disabled
-                    // onClick={() => navigate(`/bus/${schedule.bus_id}`)}
-                  >
-                    {schedule.bus_id}
-                  </Button>
+                  <>
+                    <Typography>{item.date.toString()}</Typography>
+                    <Stack>
+                      {item.bus_ids.map((bus_id) => {
+                        return (
+                          <Button key={bus_id} disabled>
+                            {bus_id}
+                          </Button>
+                        );
+                      })}
+                    </Stack>
+                  </>
                 );
               }
             })}

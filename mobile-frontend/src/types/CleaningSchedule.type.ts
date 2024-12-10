@@ -6,6 +6,10 @@ export type CleaningScheduleBackendType = {
   status: boolean;
 };
 
-export type CleaningScheduleType = Omit<CleaningScheduleBackendType, "date"> & {
+export type CleaningScheduleType = Omit<
+  CleaningScheduleBackendType,
+  "date" | "bus_id"
+> & {
   date: Date; // Override `date` to be of type `Date`
+  bus_ids: number[]; // Override `bus_id` to be of type `number[]`
 };
