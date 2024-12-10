@@ -3,13 +3,11 @@ import {
   Typography,
   Stack,
   Box,
-  Button,
 } from "@mui/material";
 
 import useAPI from "../api/useAPI";
 import React, { useContext, useEffect } from "react";
 import { AuthContext } from "../App";
-import { getID } from "../api/sessionManager";
 
 const Homepage = () => {
   

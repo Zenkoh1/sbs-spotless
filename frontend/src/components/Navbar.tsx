@@ -4,7 +4,7 @@ import { useContext } from "react";
 import { AuthContext } from "../App";
 import { Link as RouterLink } from "react-router-dom";
 
-export const Navbar = () => {
+const Navbar = () => {
   const { isAuth, setIsAuth } = useContext(AuthContext);
 
   return (
@@ -47,3 +47,5 @@ export const Navbar = () => {
     </AppBar>
   )
 }
+
+export default Navbar;
