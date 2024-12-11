@@ -1,5 +1,5 @@
 import { Search, Sort } from "@mui/icons-material";
-import { Container, Box, TextField, TableContainer, Paper, TableBody, TableCell, TableHead, TableRow, Table as MUITable, Icon, InputAdornment, Stack, IconButton } from "@mui/material";
+import { Container, Box, TextField, TableContainer, Paper, TableBody, TableCell, TableHead, TableRow, Table as MUITable, Icon, InputAdornment, Stack, IconButton, Typography } from "@mui/material";
 import { useState, useMemo } from "react";
 
 interface TableProps<T> {
@@ -35,6 +35,14 @@ const Table = <T extends object> ({ data, columns, onRowClick }: TableProps<T>) 
       return { key, direction: "ascending" };
     })
   };
+
+  if (data.length === 0) {
+    return (
+      <Container>
+        <Typography variant="h6">No data available</Typography>
+      </Container>
+    )
+  }
 
   return (
     <Container>

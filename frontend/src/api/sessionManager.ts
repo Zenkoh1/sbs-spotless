@@ -49,7 +49,13 @@ export function logoutUser(): Promise<any> {
         state.email = null;
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
-    });
+    }).catch(error => {
+        state.id = null;
+        state.name = null;
+        state.email = null;
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+    })
 }
 
 export function registerUser({name, email, password}: {name: string, email: string, password: string}): Promise<any> {

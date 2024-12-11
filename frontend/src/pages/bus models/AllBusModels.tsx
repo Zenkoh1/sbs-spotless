@@ -4,6 +4,7 @@ import BusModel from "../../types/BusModel.type";
 import { editBusModel, retrieveAllBusModels, createBusModel, deleteBusModel } from "../../api/busManagement";
 import { Button, Dialog, DialogContent, DialogTitle, Fab, Stack, TextField, Typography } from "@mui/material";
 import { Add } from "@mui/icons-material";
+import { getImagePreview } from "../../util/imageHelper";
 
 const AllBusModels = () => {
   const [busModels, setBusModels] = useState<BusModel[]>([]);
@@ -37,7 +38,7 @@ const AllBusModels = () => {
       .then(result => {
         const updatedBusModels = [...busModels, result];
         setBusModels(updatedBusModels);
-        setEditDetailsModal({ open: false, busModel: null });
+        setCreateBusModelModal(false);
       })
       .catch(error => console.error(error));
   }
@@ -54,26 +55,12 @@ const AllBusModels = () => {
 
   useEffect(() => {
     retrieveAllBusModels()
-      .then(result => setBusModels(result))
+      .then(result => {
+        setBusModels(result)
+        console.log(result)}
+      )
       .catch(error => {
-        setBusModels([
-          {
-            id: 1,
-            name: "Bus Model 1",
-            image: null,
-            description: "This is a bus model",
-            created_at: new Date(),
-            updated_at: new Date(),
-          },
-          {
-            id: 2,
-            name: "Bus Model 2",
-            image: null,
-            description: "This is another bus model",
-            created_at: new Date(),
-            updated_at: new Date(),
-          }
-        ])
+        console.log(error)
       });
   }, []);
 
@@ -131,7 +118,7 @@ const BusModelDetailsModal = ({ onClose, open, busModel, onEdit, onDelete }: { o
     <Dialog onClose={onClose} open={open}>
       <DialogTitle>{busModel.name}</DialogTitle>
       <DialogContent>
-        <img src={busModel.image ? URL.createObjectURL(busModel.image) : "defaultImagePath"} alt={busModel.name} />
+        <img src={getImagePreview(busModel.image)} alt={busModel.name} />
         <Typography variant="body1">
           <strong>ID:</strong> {busModel.id}
         </Typography>
@@ -156,7 +143,7 @@ const BusModelDetailsModal = ({ onClose, open, busModel, onEdit, onDelete }: { o
 const EditBusModelModal = ({ onClose, open, busModel, onSave }: { onClose: () => void, open: boolean, busModel: BusModel | null, onSave: (busModel: BusModel) => void }) => {
   const [name, setName] = useState(busModel?.name || "");
   const [description, setDescription] = useState(busModel?.description || "");
-  const [image, setImage] = useState<File | null>(null);
+  const [image, setImage] = useState<File | string | null>(null);
 
   useEffect(() => {
     if (busModel) {
@@ -175,7 +162,7 @@ const EditBusModelModal = ({ onClose, open, busModel, onSave }: { onClose: () =>
     <Dialog onClose={onClose} open={open}>
       <DialogTitle>Edit Bus Model</DialogTitle>
       <DialogContent>
-        {image && <img src={URL.createObjectURL(image)} alt="bus model" width="100%" />}
+        {image && <img src={getImagePreview(image)} alt="bus model" width="100%" />}
         {!image && 
           <Button variant="contained" component="label">
             Upload image

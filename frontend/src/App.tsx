@@ -34,7 +34,7 @@ function App() {
     loginUserWithToken(accessToken)
       .then(() => setIsAuth(true))
       .catch(() => {
-        setIsAuth(true); // FIXME: Set to true for testing
+        setIsAuth(false); // FIXME: Set to true for testing
       }).finally(() => {
         setLoading(false);
       });

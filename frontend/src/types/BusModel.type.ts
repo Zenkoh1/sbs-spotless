@@ -1,7 +1,7 @@
 type BusModel = {
   id: number,
   name: string,
-  image: File | null,
+  image: File | string | null,
   description: string,
   created_at?: Date,
   updated_at?: Date,
