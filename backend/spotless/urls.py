@@ -1,4 +1,5 @@
 from django.urls import path, include
+from django.conf.urls.static import static
 from rest_framework_simplejwt import views as jwt_views
 from rest_framework.routers import DefaultRouter
 from . import views
