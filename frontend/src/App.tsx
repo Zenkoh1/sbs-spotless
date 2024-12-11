@@ -17,10 +17,6 @@ import Login from "./pages/Login";
 import HomePage from "./pages/HomePage";
 import Navbar from "./components/Navbar";
 import AllBusModels from "./pages/bus models/AllBusModels";
-import ViewBusModel from "./pages/bus management/ViewBusModel";
-import CreateBusModel from "./pages/bus management/CreateBusModel";
-import CreateBus from "./pages/bus management/CreateBus";
-import EditChecklist from "./pages/bus management/EditChecklist";
 
 type AuthContextType = {
   isAuth: boolean;
