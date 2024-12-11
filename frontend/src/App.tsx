@@ -16,10 +16,7 @@ import { createTheme, responsiveFontSizes } from "@mui/material/styles";
 import Login from "./pages/Login";
 import HomePage from "./pages/HomePage";
 import Navbar from "./components/Navbar";
-import AllBusModels from "./pages/bus management/AllBusModels";
-import ViewBusModel from "./pages/bus management/ViewBusModel";
-import CreateBusModel from "./pages/bus management/CreateBusModel";
-import CreateBus from "./pages/bus management/CreateBus";
+import AllBusModels from "./pages/bus models/AllBusModels";
 
 type AuthContextType = {
   isAuth: boolean;
@@ -37,7 +34,7 @@ function App() {
     loginUserWithToken(accessToken)
       .then(() => setIsAuth(true))
       .catch(() => {
-        setIsAuth(true); // FIXME: Set to true for testing
+        setIsAuth(false); // FIXME: Set to true for testing
       }).finally(() => {
         setLoading(false);
       });
@@ -83,9 +80,7 @@ function App() {
               <Route path="/login" element={<Login />} />
 
               <Route path="/busModels" element={<AllBusModels />} />
-              <Route path="/busModels/new" element={<CreateBusModel />} />
-              <Route path="/buses/:id" element={<ViewBusModel />} />
-              <Route path="/buses/new" element={<CreateBus />} />
+
             </Routes>
           </BrowserRouter>
         </div>

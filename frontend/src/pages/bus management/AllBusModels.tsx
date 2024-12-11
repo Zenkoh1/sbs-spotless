@@ -8,9 +8,6 @@ import { Add } from "@mui/icons-material";
 const AllBusModels = () => {
   const [busModels, setBusModels] = useState<BusModel[]>();
 
-  useEffect(() => {
-    setBusModels([{model: "SBS123"}, {model: "sbs345"}]);
-  }, []);
 
   const navigate = useNavigate();
 
@@ -29,27 +26,6 @@ const AllBusModels = () => {
       </Typography>
 
       <Searchbar onSearch={(query: string) => {console.log(`Searched for ${query}`)}}/>
-
-      <Box sx={{ display: "flex", gap: "16px" }}>
-        {busModels?.map((busModel, index) => (
-          <Card 
-            key={index}
-            onClick={() => {navigate(`/buses/${busModel.model}`)}}
-          >
-            <CardContent>
-              <img
-                src="https://picsum.photos/200"
-                alt="Bus"
-                width={200}
-                height={200}
-              />
-              <Typography variant="h5">
-                {busModel.model}
-              </Typography>
-            </CardContent>
-          </Card>
-        ))}
-      </Box>
 
       <Fab
         color="primary"

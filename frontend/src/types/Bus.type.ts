@@ -1,5 +1,5 @@
 type Bus = {
-  id: string;
+  id: number;
   model: string;
   year: string;
   licensePlate: string;

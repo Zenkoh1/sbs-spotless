@@ -4,15 +4,11 @@ import Searchbar from "../../components/Searchbar";
 import { useEffect, useState } from "react";
 import Bus from "../../types/Bus.type";
 import { Edit } from "@mui/icons-material";
+import useAPI from "../../api/useAPI";
 
 const ViewBusModel = () => {
   const [buses, setBuses] = useState<Bus[]>([]);
   const { id } = useParams<{ id: string }>();
-
-  useEffect(() => setBuses([
-    {id: "1", model: "SBS123", year: "2021", licensePlate: "SBS123", seats: 40, color: "red", imageUrl: "https://picsum.photos/200", description: "Bus description"}, 
-    {id: "2", model: "SBS234", year: "2021", licensePlate: "SBS123", seats: 40, color: "red", imageUrl: "https://picsum.photos/200", description: "Bus description"},
-  ]), []);
 
   return (
     <Container>
