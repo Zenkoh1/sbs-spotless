@@ -15,10 +15,10 @@ export function editBusModel(busModel: BusModel): Promise<BusModel> {
   const formData = new FormData();
   formData.append("name", busModel.name);
   formData.append("description", busModel.description);
-  if (busModel.image) {
+  if (busModel.image instanceof File) {
     formData.append("image", busModel.image);
   }
-  return axios.put(`${BACKEND_URL}bus_models/${busModel.id}`, 
+  return axios.put(`${BACKEND_URL}bus_models/${busModel.id}/`, 
     formData, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
