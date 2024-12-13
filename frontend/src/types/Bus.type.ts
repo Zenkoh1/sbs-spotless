@@ -1,12 +1,9 @@
 type Bus = {
   id: number;
-  model: string;
-  year: string;
-  licensePlate: string;
-  seats: number;
-  color: string;
-  imageUrl: string;
-  description: string;
+  number_plate: string;
+  created_at?: Date;
+  updated_at?: Date;
+  bus_model: number
 }
 
 export default Bus;

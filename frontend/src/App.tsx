@@ -15,8 +15,9 @@ import { createTheme, responsiveFontSizes } from "@mui/material/styles";
 
 import Login from "./pages/Login";
 import HomePage from "./pages/HomePage";
-import Navbar from "./components/Navbar";
+import Layout from "./components/Layout";
 import AllBusModels from "./pages/bus models/AllBusModels";
+import AllBuses from "./pages/bus models/AllBuses";
 
 type AuthContextType = {
   isAuth: boolean;
@@ -74,14 +75,15 @@ function App() {
         <div className="App">
           <title>Spotless</title>
           <BrowserRouter>
-            <Navbar />
-            <Routes>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/login" element={<Login />} />
+            <Layout>
+              <Routes>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/login" element={<Login />} />
 
-              <Route path="/busModels" element={<AllBusModels />} />
-
-            </Routes>
+                <Route path="/busModels" element={<AllBusModels />} />
+                <Route path="buses" element={<AllBuses />} />
+              </Routes>
+            </Layout>
           </BrowserRouter>
         </div>
       </AuthContext.Provider>

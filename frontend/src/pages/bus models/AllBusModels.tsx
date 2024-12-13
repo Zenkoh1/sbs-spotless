@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import Table from "../../components/Table";
 import BusModel from "../../types/BusModel.type";
-import { editBusModel, retrieveAllBusModels, createBusModel, deleteBusModel } from "../../api/busManagement";
-import { Button, Dialog, DialogContent, DialogTitle, Fab, Stack, TextField, Typography } from "@mui/material";
+import { editBusModel, retrieveAllBusModels, createBusModel, deleteBusModel } from "../../api/busModels";
+import { Box, Button, Dialog, DialogContent, DialogTitle, Fab, Stack, TextField, Typography } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import { getImagePreview } from "../../util/imageHelper";
 
@@ -63,7 +63,7 @@ const AllBusModels = () => {
   }
 
   return (
-    <>
+    <Box>
       <Table
         data={busModels}
         columns={COLUMNS}
@@ -88,7 +88,7 @@ const AllBusModels = () => {
       >
         <Add /> 
       </Fab>
-    </>
+    </Box>
   )
 }
 
