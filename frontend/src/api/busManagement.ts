@@ -18,14 +18,14 @@ export function editBusModel(busModel: BusModel): Promise<BusModel> {
   if (busModel.image instanceof File) {
     formData.append("image", busModel.image);
   }
-  return axios.put(`${BACKEND_URL}bus_models/${busModel.id}/`, 
+  return axios.patch(`${BACKEND_URL}bus_models/${busModel.id}/`, 
     formData, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
         "Content-Type": "multipart/form-data",
       },
     },
-  );
+  ).then((response) => response.data);
 }
 
 export function createBusModel(busModel: BusModel): Promise<BusModel> {
