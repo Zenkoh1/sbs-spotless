@@ -1,25 +1,19 @@
 import { Box, Button, Stack, Typography } from "@mui/material";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useParams } from "react-router-dom";
+import { CleaningChecklistItems_BackendType } from "../types/CleaningSchedule.type";
 
 export default function Checklist(props: {
   bus_number: string;
-  locations: string[];
+  checklist: CleaningChecklistItems_BackendType[];
 }) {
-    function handleClick() {
-        // set the react context`
-
-        // navigate to the image scanning page
-        
-
-    }
   return (
     <Box>
       <Typography variant="h5">Checklist for {props.bus_number}</Typography>
       <Stack>
-        {props.locations &&
-          props.locations.map((loc) => (
-            <Button key={loc} onClick={handleClick}>
-              <Typography variant="h6">{loc}</Typography>
+        {props.checklist &&
+          props.checklist.map((item) => (
+            <Button key={item.id} component={RouterLink} to={`scan/${item.id}`}>
+              <Typography variant="h6">{item.title}</Typography>
             </Button>
           ))}
       </Stack>

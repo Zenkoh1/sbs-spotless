@@ -16,6 +16,7 @@ import {
   Route,
   BrowserRouter,
   Link as RouterLink,
+  useNavigate,
 } from "react-router-dom";
 import { logoutUser, getName, loginUserWithToken } from "./api/sessionManager";
 import Dashboardpage from "./pages/Dashboardpage";
@@ -54,7 +55,16 @@ function App() {
   }, [isAuth]);
 
   // Should be in a separate file if you want to really customize the theme
-  let theme = createTheme();
+  let theme = createTheme({
+    palette: {
+      primary: {
+        main: "#d93b20",
+      },
+      secondary: {
+        main: "#5d1e79",
+      },
+    },
+  });
   theme = responsiveFontSizes(theme);
 
   if (loading)
@@ -122,6 +132,8 @@ function App() {
                                 alert("Error logging out, refresh the page!");
                               });
                           }}
+                          component={RouterLink}
+                          to="/login"
                         >
                           Logout
                         </Button>
@@ -132,10 +144,13 @@ function App() {
               </AppBar>
               <Routes>
                 <Route path="/dashboard" element={<Dashboardpage />} />
-                <Route path="dashboard/bus/:id" element={<Buspage />} />
+                <Route path="/bus/:bus_id" element={<Buspage />} />
                 <Route path="/login" element={<Loginpage />} />
                 <Route path="/register" element={<Registerpage />} />
-                <Route path="/scan" element={<Scanpage />} />
+                <Route
+                  path="/bus/:bus_id/scan/:item_id"
+                  element={<Scanpage />}
+                />
               </Routes>
             </BrowserRouter>
           </div>
