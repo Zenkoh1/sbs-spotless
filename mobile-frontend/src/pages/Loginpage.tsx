@@ -21,11 +21,11 @@ const Loginpage = () => {
 
     loginUser({ email, password })
       .then(() => {
-        navigate("/");
+        navigate("/dashboard");
         setIsAuth(true);
       })
       .catch((error) => {
-        console.log(error)
+        console.log(error);
         alert(error.response.data);
       });
   };

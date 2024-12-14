@@ -28,7 +28,7 @@ const Registerpage = () => {
     registerUser({ email, password, name: username })
       .then(() => {
         loginUser({ email, password }).then(() => {
-          navigate("/");
+          navigate("/dashboard");
           setIsAuth(true);
           alert("User registered successfully");
         });
