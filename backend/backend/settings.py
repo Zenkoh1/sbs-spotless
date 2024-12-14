@@ -39,6 +39,7 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'spotless',
+    'spotless_survey',
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',

@@ -22,6 +22,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("api/", include("spotless.urls")),
+    path("spotless_survey_api/", include("spotless_survey.urls")),
 ]
 
 # Development only: Serve media files

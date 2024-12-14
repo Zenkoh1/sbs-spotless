@@ -21,6 +21,7 @@ class CleaningChecklistItemViewSet(viewsets.ModelViewSet):
         if CleaningChecklist.objects.filter(id=cleaning_checklist_id).count() == 0:
             raise NotFound(detail="Cleaning Checklist not found.")
         queryset = CleaningChecklistItem.objects.filter(cleaning_checklist_id=cleaning_checklist_id)
+        queryset = queryset.order_by('order')
         serializer = CleaningChecklistItemSerializer(queryset, many=True)
         return Response(serializer.data)
 
