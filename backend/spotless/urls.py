@@ -13,6 +13,7 @@ mobile_urlpatterns = [
     path('logout', views.mobileviews.LogoutView.as_view(), name = "logout"),
     path('loginwithtoken', views.mobileviews.LoginwithTokenView.as_view(), name = 'loginwithtoken'),
     path('', include(mobile_router.urls)),
+    path('cleaning_schedules/<int:cleaning_schedule_id>/checklist_steps/', views.mobileviews.CleaningChecklistStepViewSet.as_view({'get': 'list'}), name='checklist-steps'),
     path('checklist_steps/<int:pk>/', views.mobileviews.CleaningChecklistStepViewSet.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update'}), name='checklist-steps-detail'),
     path(
         'checklist_steps/<int:pk>/upload_images/',
