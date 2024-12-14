@@ -48,15 +48,25 @@ class Bus(models.Model):
     def __str__(self):
         return self.number_plate
     
+class CleaningChecklist(models.Model):
+    title = models.CharField(max_length=100)
+    description = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return self.title
+    
 """
 This is the model for the template for the cleaning checklist
 """
 class CleaningChecklistItem(models.Model):
+    cleaning_checklist = models.ForeignKey(CleaningChecklist, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
     description = models.TextField()
     order = models.IntegerField()
-    bus_model = models.ForeignKey(BusModel, on_delete=models.CASCADE)
     image = models.ImageField(upload_to="checklist_item_images/")
+    is_image_required = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -67,14 +77,15 @@ class CleaningSchedule(models.Model):
     StatusType = models.TextChoices("StatusType", "UNASSIGNED ASSIGNED IN_PROGRESS COMPLETED")
 
     bus = models.ForeignKey(Bus, on_delete=models.CASCADE)
+    cleaning_checklist = models.ForeignKey(CleaningChecklist, on_delete=models.CASCADE)
     datetime = models.DateTimeField()
-    cleaner = models.ForeignKey(User, on_delete=models.CASCADE, blank=False, null=True)
+    cleaners = models.ManyToManyField(User)
     status = models.CharField(choices=StatusType.choices, default=StatusType.UNASSIGNED, max_length=20)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
     def __str__(self):
-        return f"{self.bus.number_plate} - {self.date}"
+        return f"{self.bus.number_plate} - {self.datetime}"
     
 """
 This is the model for the actual cleaning checklist step based on the template
@@ -84,11 +95,13 @@ class CleaningChecklistStep(models.Model):
 
     cleaning_checklist_item = models.ForeignKey(CleaningChecklistItem, on_delete=models.CASCADE)
     cleaning_schedule = models.ForeignKey(CleaningSchedule, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to="checklist_step_images/", blank=True, null=True)
     status = models.CharField(choices=StatusType.choices, default=StatusType.INCOMPLETE, max_length=20)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
-    def __str__(self):
-        return self.item.title
+class CleaningChecklistStepImages(models.Model):
+    cleaning_checklist_step = models.ForeignKey(CleaningChecklistStep, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to="checklist_step_images/")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     

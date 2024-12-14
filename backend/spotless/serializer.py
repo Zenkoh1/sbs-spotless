@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, BusModel, Bus, CleaningChecklistItem, CleaningSchedule, CleaningChecklistStep
+from .models import User, BusModel, Bus, CleaningChecklist, CleaningChecklistItem, CleaningSchedule, CleaningChecklistStep, CleaningChecklistStepImages
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -30,6 +30,14 @@ class BusSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         return Bus.objects.create(**validated_data)
     
+class CleaningChecklistSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CleaningChecklist
+        fields = '__all__'
+    
+    def create(self, validated_data):
+        return CleaningChecklist.objects.create(**validated_data)
+    
 class CleaningChecklistItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = CleaningChecklistItem
@@ -40,12 +48,16 @@ class CleaningChecklistItemSerializer(serializers.ModelSerializer):
         return CleaningChecklistItem.objects.create(**validated_data)
 
 class CleaningScheduleSerializer(serializers.ModelSerializer):
+    cleaners = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all())
     class Meta:
         model = CleaningSchedule
         fields = '__all__'
     
     def create(self, validated_data):
-        return CleaningSchedule.objects.create(**validated_data)
+        cleaners = validated_data.pop('cleaners', [])
+        cleaning_schedule = CleaningSchedule.objects.create(**validated_data)
+        cleaning_schedule.cleaners.set(cleaners)
+        return cleaning_schedule
     
     '''
     This function automatically updates the status if the cleaner is assigned AND the status was unassigned
@@ -59,12 +71,19 @@ class CleaningScheduleSerializer(serializers.ModelSerializer):
         else:
             final_status = CleaningSchedule.StatusType.UNASSIGNED
 
-        if 'cleaner' in self.validated_data:
+        if 'cleaners' in self.validated_data and self.validated_data['cleaners']:
             if final_status == CleaningSchedule.StatusType.UNASSIGNED:
                 self.validated_data['status'] = CleaningSchedule.StatusType.ASSIGNED
         return super().save(**kwargs)
 
+class CleaningChecklistStepImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CleaningChecklistStepImages
+        fields = ['id', 'image', 'created_at']
+
 class CleaningChecklistStepSerializer(serializers.ModelSerializer):
+    images = CleaningChecklistStepImageSerializer(many=True, read_only=True)
+
     class Meta:
         model = CleaningChecklistStep
         fields = '__all__'
@@ -72,4 +91,3 @@ class CleaningChecklistStepSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         return CleaningChecklistStep.objects.create(**validated_data)
-        
