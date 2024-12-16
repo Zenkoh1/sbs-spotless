@@ -1,57 +1,29 @@
+import React, { Suspense, useContext, useEffect, useState } from "react";
+import { AuthContext } from "../App";
 import {
   CircularProgress,
   Typography,
   Stack,
   Box,
-  Button,
   AppBar,
   Tabs,
   Tab,
   useTheme,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  IconButton,
 } from "@mui/material";
-
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
+import { useNavigate } from "react-router-dom";
 import useAPI from "../api/useAPI";
-import React, { Suspense, useContext, useEffect, useState } from "react";
-import { AuthContext } from "../App";
-import { getID } from "../api/sessionManager";
-import { BusType } from "../types/Bus.type";
-import { Link as RouterLink, Outlet, useNavigate } from "react-router-dom";
-import { useBuses } from "../context/busContext";
 import {
-  CleaningSchedule_BackendType,
-  Status,
+  CleaningSchedule_Backend_Type,
+  CleaningSchedule_Frontend_Type,
 } from "../types/CleaningSchedule.type";
-
-const sampleData: CleaningSchedule_BackendType[] = [
-  {
-    id: 1,
-    user_id: 1,
-    date: "2024-12-14",
-    bus_ids: [1],
-    status: Status.ASSIGNED,
-  },
-  {
-    id: 2,
-    user_id: 1,
-    date: "2024-12-15",
-    bus_ids: [1],
-    status: Status.ASSIGNED,
-  },
-  {
-    id: 3,
-    user_id: 1,
-    date: "2024-12-16",
-    bus_ids: [1],
-    status: Status.ASSIGNED,
-  },
-  {
-    id: 4,
-    user_id: 1,
-    date: "2024-12-17",
-    bus_ids: [1],
-    status: Status.ASSIGNED,
-  },
-];
 
 const getStartOfDay = (date: Date) => {
   const start = new Date(date);
@@ -67,9 +39,45 @@ const Dashboardpage = () => {
     setValue(newValue);
   };
 
+  const { fetchAPI, loading, data } =
+    useAPI<CleaningSchedule_Backend_Type[]>(`cleaning_schedules`);
+  const { isAuth } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const [schedules, setSchedules] = useState<CleaningSchedule_Frontend_Type[]>(
+    []
+  );
+
+  useEffect(() => {
+    if (!isAuth) {
+      navigate("/login");
+    }
+    fetchAPI();
+    if (!loading) {
+      const groupedSchedules: CleaningSchedule_Frontend_Type[] = [];
+      data!.forEach((schedule) => {
+        const datetime = new Date(schedule.datetime);
+        const existingGroup = groupedSchedules.find(
+          (group) => group.datetime.getTime() === datetime.getTime()
+        );
+        if (existingGroup) {
+          existingGroup.schedules.push(schedule);
+        } else {
+          groupedSchedules.push({
+            datetime,
+            schedules: [schedule],
+          });
+        }
+      });
+      groupedSchedules.sort(
+        (a, b) => a.datetime.getTime() - b.datetime.getTime()
+      );
+      setSchedules(groupedSchedules);
+      // console.log(groupedSchedules);
+    }
+  }, [isAuth, loading]);
+
   return (
-    <Box display="inline-block" width="100vw">
-      <Typography variant="h4">DASHBOARD</Typography>
+    <Box sx={{ width: "100%" }}>
       <Box sx={{ bgcolor: "background.paper", width: "100%" }}>
         <AppBar position="static">
           <Tabs
@@ -81,17 +89,18 @@ const Dashboardpage = () => {
             aria-label="dashboard-tabs"
           >
             <Tab label="Today's Schedule" {...a11yProps(0)} />
-            <Tab label="All Schedule" {...a11yProps(1)} />
+            <Tab label="All Schedules" {...a11yProps(1)} />
           </Tabs>
         </AppBar>
+
         <TabPanel value={value} index={0} dir={theme.direction}>
-          <TodaySchedule />
+          <TodaySchedule schedules={schedules} />
         </TabPanel>
+
         <TabPanel value={value} index={1} dir={theme.direction}>
-          <AllSchedules />
+          <AllSchedules schedules={schedules} />
         </TabPanel>
       </Box>
-      <Outlet />
     </Box>
   );
 };
@@ -114,11 +123,7 @@ function TabPanel(props: TabPanelProps) {
       aria-labelledby={`tab-${index}`}
       {...other}
     >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          <Typography>{children}</Typography>
-        </Box>
-      )}
+      {value === index && <Box sx={{ p: 3 }}>{children}</Box>}
     </div>
   );
 }
@@ -130,163 +135,90 @@ function a11yProps(index: number) {
   };
 }
 
-function TodaySchedule() {
-  // Get today's schedule
-  const { fetchAPI, loading, data } = useAPI<CleaningSchedule_BackendType[]>(
-    `gettodayschedule`,
-    {
-      headers: {
-        "content-type": "application/json",
-      },
-    }
-  );
-  const [scheduleItem, setScheduleItem] = useState<
-    CleaningSchedule_BackendType[]
-  >([]);
-  const isAuth = useContext(AuthContext);
+function TodaySchedule(props: { schedules: CleaningSchedule_Frontend_Type[] }) {
+  const { schedules } = props;
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!isAuth) {
-      navigate("/login");
-    }
-    // fetchAPI();
-
-    setScheduleItem([sampleData[0]]);
-  }, [isAuth]);
-
+  const todaySchedules = schedules.find(
+    (item) =>
+      getStartOfDay(item.datetime).getTime() ===
+      getStartOfDay(new Date()).getTime()
+  );
   return (
-    <Stack>
-      <Typography>Today's schedule</Typography>
-      <Stack>
-        {scheduleItem.map((item) => {
-          return (
-            <>
-              <Typography>{item.date.toString()}</Typography>
-              <Stack>
-                {item.bus_ids.map((bus_id) => {
-                  return (
-                    <Button
-                      key={bus_id}
-                      onClick={() => navigate(`/bus/${bus_id}`)}
-                    >
-                      {bus_id}
-                    </Button>
-                  );
-                })}
-              </Stack>
-            </>
-          );
-        })}
-      </Stack>
+    <Stack spacing={3}>
+      <Typography variant="h5">Today's Schedule</Typography>
+      <Paper sx={{ overflowX: "auto" }}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Date</TableCell>
+              <TableCell>Bus Plate Numbers</TableCell>
+              <TableCell>Action</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {todaySchedules && todaySchedules.schedules.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={3}>No schedules for today</TableCell>
+              </TableRow>
+            )}
+            {todaySchedules &&
+              todaySchedules.schedules.map((item) => (
+                <TableRow key={item.id}>
+                  <TableCell>{item.datetime}</TableCell>
+                  <TableCell>Bus {item.bus.number_plate}</TableCell>
+                  <TableCell>
+                    {item.status != "COMPLETED" && (
+                      <IconButton
+                        color="primary"
+                        onClick={() =>
+                          navigate(
+                            `/checklist/${item.id}/${item.bus.number_plate}`
+                          )
+                        }
+                      >
+                        <ArrowForwardIcon />
+                      </IconButton>
+                    )}
+                  </TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+      </Paper>
     </Stack>
   );
 }
 
-function AllSchedules() {
-  // Get all schedules
-  const { fetchAPI, loading, data } = useAPI<CleaningSchedule_BackendType[]>(
-    `getschedules`,
-    {
-      headers: {
-        "content-type": "application/json",
-      },
-    }
-  );
-  const [scheduleItem, setScheduleItem] = useState<
-    CleaningSchedule_BackendType[]
-  >([]);
-  const isAuth = useContext(AuthContext);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!isAuth) {
-      navigate("/login");
-    }
-    // fetchAPI();
-
-    setScheduleItem(sampleData);
-  }, [isAuth]);
+function AllSchedules(props: { schedules: CleaningSchedule_Frontend_Type[] }) {
+  const { schedules } = props;
   return (
-    <Stack>
-      <Typography>All schedules</Typography>
-      <Stack>
-        {sampleData.map((item) => {
-          return (
-            <>
-              <Typography>{item.date.toString()}</Typography>
-              <Stack>
-                {item.bus_ids.map((bus_id) => {
-                  return (
-                    <Button key={bus_id} disabled>
-                      {bus_id}
-                    </Button>
-                  );
-                })}
-              </Stack>
-            </>
-          );
-        })}
-      </Stack>
+    <Stack spacing={3}>
+      <Typography variant="h5">All Schedules</Typography>
+      <Paper sx={{ overflowX: "auto" }}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Date</TableCell>
+              <TableCell>Bus Number Plates</TableCell>
+            </TableRow>
+          </TableHead>
+
+          <TableBody>
+            {schedules.map((item) => (
+              <TableRow key={item.datetime.getTime()}>
+                <TableCell>{item.datetime.toDateString()}</TableCell>
+                <TableCell>
+                  {item.schedules
+                    .map((schedule) => `${schedule.bus.number_plate}`)
+                    .join(", ")}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Paper>
     </Stack>
   );
 }
 
 export default Dashboardpage;
-
-/**
- * <Suspense
-        fallback={
-          <Stack alignItems="center">
-            <CircularProgress />
-          </Stack>
-        }
-      >
-        <Box>
-          <Typography variant="h5">Schedule</Typography>
-          <Stack>
-            {scheduleItem.map((item) => {
-              const today = getStartOfDay(new Date());
-              const tomorrow = new Date(
-                new Date().setDate(today.getDate() + 1)
-              );
-              const itemDate = new Date(item.date);
-              if (itemDate > today && itemDate < tomorrow) {
-                return (
-                  <>
-                    <Typography>{item.date.toString()}</Typography>
-                    <Stack>
-                      {item.bus_ids.map((bus_id) => {
-                        return (
-                          <Button
-                            key={bus_id}
-                            onClick={() => navigate(`bus/${bus_id}`)}
-                          >
-                            {bus_id}
-                          </Button>
-                        );
-                      })}
-                    </Stack>
-                  </>
-                );
-              } else if (itemDate > today) {
-                return (
-                  <>
-                    <Typography>{item.date.toString()}</Typography>
-                    <Stack>
-                      {item.bus_ids.map((bus_id) => {
-                        return (
-                          <Button key={bus_id} disabled>
-                            {bus_id}
-                          </Button>
-                        );
-                      })}
-                    </Stack>
-                  </>
-                );
-              }
-            })}
-          </Stack>
-        </Box>
-      </Suspense>
- */
