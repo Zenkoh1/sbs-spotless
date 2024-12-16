@@ -49,6 +49,7 @@ class CleaningChecklistItemSerializer(serializers.ModelSerializer):
 
 class CleaningScheduleSerializer(serializers.ModelSerializer):
     cleaners = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all())
+    bus = BusSerializer()
     class Meta:
         model = CleaningSchedule
         fields = '__all__'
@@ -82,6 +83,7 @@ class CleaningChecklistStepImageSerializer(serializers.ModelSerializer):
         fields = ['id', 'image', 'created_at']
 
 class CleaningChecklistStepSerializer(serializers.ModelSerializer):
+    cleaning_checklist_item = CleaningChecklistItemSerializer()
     images = CleaningChecklistStepImageSerializer(many=True, read_only=True)
 
     class Meta:

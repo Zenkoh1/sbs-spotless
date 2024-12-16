@@ -16,8 +16,11 @@ class CleaningScheduleViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     http_method_names = ['get', 'patch']
 
-    def get_queryset(self):
-        return super().get_queryset().filter(cleaner=self.request.user)
+    def list(self, request, *args, **kwargs):
+        queryset = CleaningSchedule.objects.filter(cleaners=request.user)
+        
+        serializer = CleaningScheduleSerializer(queryset, many=True)
+        return Response(serializer.data)
     
 
 '''
@@ -55,4 +58,3 @@ class CleaningChecklistStepViewSet(viewsets.ModelViewSet):
                 image=image
             )
         return Response({"detail": "Images uploaded successfully."})
-
