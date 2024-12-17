@@ -80,3 +80,23 @@ export function createChecklistItem(checklistId: number, checklistItem: Checklis
     },
   ).then((response) => response.data);
 }
+
+
+export function editChecklistItemOrder(checklistItemId: number, newOrder: number): Promise<void> {
+  return axios.patch(`${BACKEND_URL}checklist_items/${checklistItemId}/`, 
+    { order: newOrder }, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+    },
+  );
+}
+
+export function deleteChecklistItem(checklistItemId: number): Promise<void> {
+  return axios.delete(`${BACKEND_URL}checklist_items/${checklistItemId}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+      },
+    },
+  );
+}

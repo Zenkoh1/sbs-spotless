@@ -1,14 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import { createChecklistItem, retrieveChecklistById, retrieveChecklistItems as retrieveChecklistItems } from "../../api/checklists";
-import { CircularProgress, Container, Paper, TableContainer, Typography, Table as MUITable, TableHead, TableRow, TableCell, Table, TableBody, Fab, DialogTitle, DialogContent, TextField, Checkbox, Button, Dialog, Stack } from "@mui/material";
+import { useNavigate, useParams } from "react-router-dom";
+import { createChecklistItem, deleteChecklist, deleteChecklistItem, editChecklistItemOrder, retrieveChecklistById, retrieveChecklistItems as retrieveChecklistItems } from "../../api/checklists";
+import { CircularProgress, Container, Paper, TableContainer, Typography, Table as MUITable, TableHead, TableRow, TableCell, Table, TableBody, Fab, DialogTitle, DialogContent, TextField, Checkbox, Button, Dialog, Stack, IconButton, Box } from "@mui/material";
 import ChecklistItem from "../../types/ChecklistItem.type";
 import Checklist from "../../types/Checklist.type";
-import { Add } from "@mui/icons-material";
+import { Add, ArrowDownward, ArrowUpward, Delete } from "@mui/icons-material";
 import { getImagePreview } from "../../util/imageHelper";
 
 const ViewChecklist = () => {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const [checklist, setChecklist] = useState<Checklist | null>(null);
   const [checklistSteps, setChecklistSteps] = useState<ChecklistItem[]>([]);
 
@@ -29,7 +30,13 @@ const ViewChecklist = () => {
       .catch(error => console.error(error));
   }, [id]);
 
-  const handleCreate = (values: ChecklistItem) => {
+  const handleDeleteChecklist = () => {
+    if (!id) return;
+    deleteChecklist(parseInt(id))
+      .then(() => navigate("/checklists"));
+  }
+
+  const handleCreateItem = (values: ChecklistItem) => {
     if (!id) return;
     createChecklistItem(parseInt(id), values)
       .then(result => {
@@ -43,6 +50,28 @@ const ViewChecklist = () => {
     if (!id) return;
   }
 
+  const handleIncreaseOrder = (id: number) => {
+    if (!id) return;
+    editChecklistItemOrder(id, checklistSteps.find(step => step.id === id)?.order || 0 + 1)
+      .then(() => {
+        setChecklistSteps(checklistSteps.map(step => step.id === id ? { ...step, order: step.order + 1 } : step));
+      });
+  }
+
+  const handleDecreaseOrder = (id: number) => {
+    editChecklistItemOrder(id, checklistSteps.find(step => step.id === id)?.order || 0 - 1)
+      .then(() => {
+        setChecklistSteps(checklistSteps.map(step => step.id === id ? { ...step, order: step.order - 1 } : step));
+      });
+  }
+
+  const handleDeleteItem = (id: number) => {
+    deleteChecklistItem(id)
+      .then(() => {
+        setChecklistSteps(checklistSteps.filter(step => step.id !== id));
+      });
+  }
+
   if (!checklist) {
     return (
       <Container>
@@ -53,16 +82,21 @@ const ViewChecklist = () => {
 
   return (
     <Container>
-      <Typography variant="h4">{checklist.title}</Typography>
-      <Typography variant="body1">{checklist.description}</Typography>
-      <ChecklistTable checklistSteps={checklistSteps}/>
+      <Stack direction="row" spacing={2} mb={2}>
+        <Box>
+          <Typography variant="h4">{checklist.title}</Typography>
+          <Typography variant="body1">{checklist.description}</Typography>
+        </Box>
+        <Button variant="contained" color="secondary" onClick={handleDeleteChecklist}>Delete</Button>
+      </Stack>
+      <ChecklistTable checklistSteps={checklistSteps} handleIncreaseOrder={handleIncreaseOrder} handleDecreaseOrder={handleDecreaseOrder} handleDeleteItem={handleDeleteItem}/>
       <Fab color="primary" aria-label="add" sx={{ position: 'fixed', bottom: 16, right: 16 }} onClick={() => setCreateModalIsOpen(true)}>
         <Add />
       </Fab>
       <ChecklistItemForm
-        initialValues={{ id: 0, order: 0, title: "", description: "", is_image_required: false, image: "", cleaning_checklist: parseInt(id || "0") }}
+        initialValues={{ id: 0, order: checklistSteps.length > 0 ? Math.max(...checklistSteps.map(step => step.order)) + 1 : 1, title: "", description: "", is_image_required: false, image: "", cleaning_checklist: parseInt(id || "0") }}
         open={createModalIsOpen}
-        onSubmit={handleCreate}
+        onSubmit={handleCreateItem}
         onCancel={() => setCreateModalIsOpen(false)}
         onClose={() => setCreateModalIsOpen(false)}
       /> 
@@ -78,25 +112,37 @@ const ViewChecklist = () => {
   )
 }
 
-const ChecklistTable = ({ checklistSteps } : { checklistSteps: ChecklistItem[] }) => {
+const ChecklistTable = ({ checklistSteps, handleIncreaseOrder, handleDecreaseOrder, handleDeleteItem } : { checklistSteps: ChecklistItem[], handleIncreaseOrder: (id: number) => void, handleDecreaseOrder: (id: number) => void, handleDeleteItem: (id: number) => void }) => {
   return (
     <TableContainer component={Paper}>
       <MUITable>
         <TableHead>
           <TableRow>
-            <TableCell>Order</TableCell>
+            <TableCell sx={{width:"5%"}}>Order</TableCell>
             <TableCell>Title</TableCell>
             <TableCell>Content</TableCell>
+            <TableCell sx={{width:"20%"}}>Action</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {checklistSteps.map((step, index) => (
+          {checklistSteps.sort((a, b) => a.order - b.order).map((step, index) => (
             <TableRow key={index}>
-              <TableCell>{step.order}</TableCell>
+              <TableCell sx={{width:"5%"}}>{step.order}</TableCell>
               <TableCell>{step.title}</TableCell>
               <TableCell>
                 <Typography variant="body2">{step.description}</Typography>
                 <img src={getImagePreview(step.image)} alt={step.title} style={{ width: 100, height: 100 }} />
+              </TableCell>
+              <TableCell sx={{width:"20%"}}>
+                <IconButton onClick={() => handleDecreaseOrder(step.id)}>
+                  <ArrowUpward />
+                </IconButton>
+                <IconButton onClick={() => handleIncreaseOrder(step.id)}>
+                  <ArrowDownward />
+                </IconButton>
+                <IconButton onClick={() => handleDeleteItem(step.id)}>
+                  <Delete />
+                </IconButton>
               </TableCell>
             </TableRow>
           ))}
