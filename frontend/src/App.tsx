@@ -18,6 +18,8 @@ import HomePage from "./pages/HomePage";
 import Layout from "./components/Layout";
 import AllBusModels from "./pages/bus models/AllBusModels";
 import AllBuses from "./pages/bus models/AllBuses";
+import AllChecklists from "./pages/checklist/AllChecklists";
+import ViewChecklist from "./pages/checklist/ViewChecklist";
 
 type AuthContextType = {
   isAuth: boolean;
@@ -81,7 +83,9 @@ function App() {
                 <Route path="/login" element={<Login />} />
 
                 <Route path="/busModels" element={<AllBusModels />} />
-                <Route path="buses" element={<AllBuses />} />
+                <Route path="/buses" element={<AllBuses />} />
+                <Route path="/checklists" element={<AllChecklists />} />
+                <Route path="/checklists/:id" element={<ViewChecklist />} />
               </Routes>
             </Layout>
           </BrowserRouter>
