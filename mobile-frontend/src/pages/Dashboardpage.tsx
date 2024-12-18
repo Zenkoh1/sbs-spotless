@@ -25,12 +25,6 @@ import {
   CleaningSchedule_Frontend_Type,
 } from "../types/CleaningSchedule.type";
 
-const getStartOfDay = (date: Date) => {
-  const start = new Date(date);
-  start.setHours(0, 0, 0, 0);
-  return start;
-};
-
 const Dashboardpage = () => {
   const theme = useTheme();
   const [value, setValue] = React.useState(0);
@@ -135,14 +129,36 @@ function a11yProps(index: number) {
   };
 }
 
+function isToday(date: Date) {
+  const now = new Date();
+  const startOfToday = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate()
+  );
+  const endOfToday = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    23,
+    59,
+    59,
+    999
+  );
+  return date >= startOfToday && date <= endOfToday;
+}
+
 function TodaySchedule(props: { schedules: CleaningSchedule_Frontend_Type[] }) {
   const { schedules } = props;
   const navigate = useNavigate();
-  const todaySchedules = schedules.find(
-    (item) =>
-      getStartOfDay(item.datetime).getTime() ===
-      getStartOfDay(new Date()).getTime()
-  );
+  const todaySchedules = schedules.filter((item) => isToday(item.datetime));
+
+  todaySchedules.forEach((item) => {
+    item.schedules.sort(
+      (a, b) => new Date(a.datetime).getTime() - new Date(b.datetime).getTime()
+    );
+  });
+
   return (
     <Stack spacing={3}>
       <Typography variant="h5">Today's Schedule</Typography>
@@ -150,29 +166,31 @@ function TodaySchedule(props: { schedules: CleaningSchedule_Frontend_Type[] }) {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Date</TableCell>
-              <TableCell>Bus Plate Numbers</TableCell>
+              <TableCell>Time</TableCell>
+              <TableCell>Bus Plate Number</TableCell>
               <TableCell>Action</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {todaySchedules && todaySchedules.schedules.length === 0 && (
+            {todaySchedules.length === 0 && (
               <TableRow>
                 <TableCell colSpan={3}>No schedules for today</TableCell>
               </TableRow>
             )}
-            {todaySchedules &&
-              todaySchedules.schedules.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell>{item.datetime}</TableCell>
-                  <TableCell>Bus {item.bus.number_plate}</TableCell>
+            {todaySchedules.map((item) =>
+              item.schedules.map((schedule) => (
+                <TableRow key={schedule.id}>
                   <TableCell>
-                    {item.status != "COMPLETED" && (
+                    {new Date(schedule.datetime).toLocaleTimeString()}
+                  </TableCell>
+                  <TableCell>{schedule.bus.number_plate}</TableCell>
+                  <TableCell>
+                    {schedule.status !== "COMPLETED" && (
                       <IconButton
                         color="primary"
                         onClick={() =>
                           navigate(
-                            `/checklist/${item.id}/${item.bus.number_plate}`
+                            `/checklist/${schedule.id}/${schedule.bus.number_plate}`
                           )
                         }
                       >
@@ -181,7 +199,8 @@ function TodaySchedule(props: { schedules: CleaningSchedule_Frontend_Type[] }) {
                     )}
                   </TableCell>
                 </TableRow>
-              ))}
+              ))
+            )}
           </TableBody>
         </Table>
       </Paper>
@@ -206,7 +225,7 @@ function AllSchedules(props: { schedules: CleaningSchedule_Frontend_Type[] }) {
           <TableBody>
             {schedules.map((item) => (
               <TableRow key={item.datetime.getTime()}>
-                <TableCell>{item.datetime.toDateString()}</TableCell>
+                <TableCell>{item.datetime.toLocaleString()}</TableCell>
                 <TableCell>
                   {item.schedules
                     .map((schedule) => `${schedule.bus.number_plate}`)

@@ -114,23 +114,23 @@ def create_data():
         CleaningSchedule(bus=buses[0], cleaning_checklist=cleaning_checklist, datetime=datetime(year, month, day, 8, 0)),
         CleaningSchedule(bus=buses[1], cleaning_checklist=cleaning_checklist, datetime=datetime(year, month, day, 8, 0)),
         CleaningSchedule(bus=buses[2], cleaning_checklist=cleaning_checklist, datetime=datetime(year, month, day, 8, 0)),
-        CleaningSchedule(bus=buses[3], cleaning_checklist=cleaning_checklist, datetime=datetime(year, month, day, 8, 0)),
-        CleaningSchedule(bus=buses[4], cleaning_checklist=cleaning_checklist, datetime=datetime(year, month, day, 8, 0)),
-        CleaningSchedule(bus=buses[5], cleaning_checklist=cleaning_checklist, datetime=datetime(year, month, day, 8, 0)),
+        CleaningSchedule(bus=buses[3], cleaning_checklist=cleaning_checklist, datetime=datetime(year, month, day, 12, 0)),
+        CleaningSchedule(bus=buses[4], cleaning_checklist=cleaning_checklist, datetime=datetime(year, month, day, 12, 0)),
+        CleaningSchedule(bus=buses[5], cleaning_checklist=cleaning_checklist, datetime=datetime(year, month, day, 12, 0)),
 
         CleaningSchedule(bus=buses[0], cleaning_checklist=cleaning_checklist, datetime=datetime(year, month, day, 8, 0) + timedelta(days=1)),
         CleaningSchedule(bus=buses[1], cleaning_checklist=cleaning_checklist, datetime=datetime(year, month, day, 8, 0) + timedelta(days=1)),
         CleaningSchedule(bus=buses[2], cleaning_checklist=cleaning_checklist, datetime=datetime(year, month, day, 8, 0) + timedelta(days=1)),
-        CleaningSchedule(bus=buses[3], cleaning_checklist=cleaning_checklist, datetime=datetime(year, month, day, 8, 0) + timedelta(days=1)),
-        CleaningSchedule(bus=buses[4], cleaning_checklist=cleaning_checklist, datetime=datetime(year, month, day, 8, 0) + timedelta(days=1)),
-        CleaningSchedule(bus=buses[5], cleaning_checklist=cleaning_checklist, datetime=datetime(year, month, day, 8, 0) + timedelta(days=1)),
+        CleaningSchedule(bus=buses[3], cleaning_checklist=cleaning_checklist, datetime=datetime(year, month, day, 12, 0) + timedelta(days=1)),
+        CleaningSchedule(bus=buses[4], cleaning_checklist=cleaning_checklist, datetime=datetime(year, month, day, 12, 0) + timedelta(days=1)),
+        CleaningSchedule(bus=buses[5], cleaning_checklist=cleaning_checklist, datetime=datetime(year, month, day, 12, 0) + timedelta(days=1)),
 
         CleaningSchedule(bus=buses[0], cleaning_checklist=cleaning_checklist, datetime=datetime(year, month, day, 8, 0) + timedelta(days=2)),
         CleaningSchedule(bus=buses[1], cleaning_checklist=cleaning_checklist, datetime=datetime(year, month, day, 8, 0) + timedelta(days=2)),
         CleaningSchedule(bus=buses[2], cleaning_checklist=cleaning_checklist, datetime=datetime(year, month, day, 8, 0) + timedelta(days=2)),
-        CleaningSchedule(bus=buses[3], cleaning_checklist=cleaning_checklist, datetime=datetime(year, month, day, 8, 0) + timedelta(days=2)),
-        CleaningSchedule(bus=buses[4], cleaning_checklist=cleaning_checklist, datetime=datetime(year, month, day, 8, 0) + timedelta(days=2)),
-        CleaningSchedule(bus=buses[5], cleaning_checklist=cleaning_checklist, datetime=datetime(year, month, day, 8, 0) + timedelta(days=2)),
+        CleaningSchedule(bus=buses[3], cleaning_checklist=cleaning_checklist, datetime=datetime(year, month, day, 12, 0) + timedelta(days=2)),
+        CleaningSchedule(bus=buses[4], cleaning_checklist=cleaning_checklist, datetime=datetime(year, month, day, 12, 0) + timedelta(days=2)),
+        CleaningSchedule(bus=buses[5], cleaning_checklist=cleaning_checklist, datetime=datetime(year, month, day, 12, 0) + timedelta(days=2)),
     ]
     for cleaning_schedule in cleaning_schedules:
         cleaning_schedule.save()
