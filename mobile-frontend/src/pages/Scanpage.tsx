@@ -13,6 +13,9 @@ import ReplayIcon from "@mui/icons-material/Replay";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CancelIcon from "@mui/icons-material/Cancel";
 import useAPI from "../api/useAPI";
+import { CleaningChecklistStep_Backend_Type } from "../types/CleaningSchedule.type";
+import axios from "axios";
+import { BACKEND_URL } from "../constants";
 
 function ScannedImageComponent(props: {
   img: ImageObjectType;
@@ -28,93 +31,97 @@ function ScannedImageComponent(props: {
     setImageToReplaceIndex,
     handleDeleteImage,
   } = props;
-  const [rating, setRating] = useState<number | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [rating, setRating] = useState<number>();
+  const isAuth = useContext(AuthContext);
+  const navigate = useNavigate();
 
-  // Simulating an API call to fetch cleanliness rating
-  const fetchCleanlinessRating = async () => {
-    setLoading(true);
-    setTimeout(() => {
-      setRating(Math.floor(Math.random() * 100));
-      setLoading(false);
-    }, 5000);
-    try {
-      const response = await fetch(
-        `/api/getcleanlinessrating/${img.imageFile.name}`
-      );
-      const data = await response.json();
-      setRating(data.rating);
-    } catch (error) {
-      console.error("Failed to fetch cleanliness rating:", error);
-      setRating(null);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { fetchAPI, loading, data } = useAPI<number>(`scanimage`);
 
   useEffect(() => {
-    fetchCleanlinessRating();
-  }, [img.imageFile.name]);
+    if (!isAuth) {
+      console.log("User is not authenticated, redirecting to login page");
+      navigate("/login");
+    }
+    if (!loading) {
+      console.log(data);
+      setRating(data!);
+    }
+  }, [isAuth, loading]);
 
   return (
     <Box
       key={index}
-      textAlign="center"
       position="relative"
       sx={{
         border: imageToReplaceIndex === index ? "2px solid #1976d2" : "none",
         borderRadius: "8px",
-        padding: "4px",
+        padding: "8px",
         backgroundColor:
           imageToReplaceIndex === index ? "#e3f2fd" : "transparent",
+        boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
+        display: "flex",
+        alignItems: "center",
+        gap: "16px",
+        width: "90%",
       }}
     >
+      {/* Image */}
       <img
         src={img.imagePreview}
         alt={`Uploaded Preview ${index}`}
         style={{
-          maxWidth: "100px",
-          maxHeight: "100px",
-          marginBottom: "8px",
+          width: "80px",
+          height: "80px",
+          objectFit: "cover",
+          borderRadius: "4px",
         }}
       />
-      <Stack direction="row" justifyContent="center" spacing={1}>
-        <IconButton
-          size="small"
-          color={imageToReplaceIndex === index ? "secondary" : "primary"}
-          onClick={() =>
-            setImageToReplaceIndex(imageToReplaceIndex === index ? null : index)
-          }
-        >
-          {imageToReplaceIndex === index ? <CancelIcon /> : <ReplayIcon />}
-        </IconButton>
-        <IconButton
-          size="small"
-          color="error"
-          onClick={() => handleDeleteImage(index)}
-        >
-          <DeleteIcon />
-        </IconButton>
-      </Stack>
-      <Box mt={2}>
+
+      {/* Rating */}
+      <Box flex="1">
         {loading ? (
           <CircularProgress size={24} />
         ) : (
-          <Typography variant="body2">
+          <Typography variant="body2" noWrap>
             {rating !== null
               ? `Cleanliness Rating: ${rating}/100`
               : "Rating not available"}
           </Typography>
         )}
       </Box>
+
+      {/* Retake Icon */}
+      <IconButton
+        color={imageToReplaceIndex === index ? "secondary" : "primary"}
+        onClick={() =>
+          setImageToReplaceIndex(imageToReplaceIndex === index ? null : index)
+        }
+        sx={{ flexShrink: 0 }}
+      >
+        <ReplayIcon />
+      </IconButton>
+
+      {/* Delete Icon */}
+      <IconButton
+        color="error"
+        onClick={() => handleDeleteImage(index)}
+        sx={{ flexShrink: 0 }}
+      >
+        <DeleteIcon />
+      </IconButton>
     </Box>
   );
 }
 
 export default function Scanpage() {
-  const { bus_id, item_id } = useParams();
+  const { schedule_id, number_plate, step_id } = useParams();
   const { isAuth } = useContext(AuthContext);
   const navigate = useNavigate();
+  const { fetchAPI, loading, data } =
+    useAPI<CleaningChecklistStep_Backend_Type>(`checklist_steps/${step_id}`, {
+      method: "GET",
+    });
+  const [step, setStep] = useState<CleaningChecklistStep_Backend_Type>();
 
   const [images, setImages] = useState<ImageObjectType[]>([]);
   const [imageToReplaceIndex, setImageToReplaceIndex] = useState<number | null>(
@@ -126,7 +133,12 @@ export default function Scanpage() {
       console.log("User is not authenticated, redirecting to login page");
       navigate("/login");
     }
-  }, [isAuth, navigate]);
+    fetchAPI();
+    if (!loading) {
+      console.log(data);
+      setStep(data!);
+    }
+  }, [isAuth, loading]);
 
   const handleDeleteImage = (index: number) => {
     setImages((prev) => prev.filter((_, i) => i !== index));
@@ -136,17 +148,62 @@ export default function Scanpage() {
     }
   };
 
+  const submitImages = async () => {
+    try {
+      const uploadImageResponse = await axios.patch(
+        `${BACKEND_URL}checklist_steps/${step_id}/upload_images/`,
+        {
+          images: images.map((img) => img.imageFile),
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
+      if (uploadImageResponse.status === 200) {
+        const updateStatusResponse = await axios.patch(
+          `${BACKEND_URL}checklist_steps/${step_id}/`,
+          {
+            status: "COMPLETE",
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            },
+          }
+        );
+        if (updateStatusResponse.status === 200) {
+          navigate(`/checklist/${schedule_id}/${number_plate}`);
+        }
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Error submitting images, refresh page");
+    }
+  };
+
   return (
     <Stack spacing={2} alignItems="center">
-      <h1>Scanpage</h1>
-      <img src="https://via.placeholder.com/150" alt="placeholder" />
+      <h1>{step?.cleaning_checklist_item.title}</h1>
+      <img
+        src={
+          step?.cleaning_checklist_item.image
+            ? step.cleaning_checklist_item.image
+            : "https://via.placeholder.com/150"
+        }
+        alt="Image of item to clean"
+      />
+      <Typography variant="h6">
+        {step?.cleaning_checklist_item.description}
+      </Typography>
       <UploadImageComponent
         images={images}
         setImages={setImages}
         imageToReplaceIndex={imageToReplaceIndex}
         setImageToReplaceIndex={setImageToReplaceIndex}
       />
-      <Stack spacing={2}>
+      <Stack spacing={2} width={"100%"} alignItems={"center"}>
         {images.map((img, index) => (
           <ScannedImageComponent
             key={img.imageFile.name}
@@ -158,6 +215,21 @@ export default function Scanpage() {
           />
         ))}
       </Stack>
+      <Button
+        variant={
+          !step?.cleaning_checklist_item.is_image_required || images.length > 0
+            ? "contained"
+            : "outlined"
+        }
+        disabled={
+          !step?.cleaning_checklist_item.is_image_required || images.length > 0
+            ? false
+            : true
+        }
+        onClick={submitImages}
+      >
+        Cleaned
+      </Button>
     </Stack>
   );
 }

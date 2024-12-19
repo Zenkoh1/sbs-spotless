@@ -10,6 +10,8 @@ import {
   Typography,
   ThemeProvider,
   CircularProgress,
+  IconButton,
+  useMediaQuery,
 } from "@mui/material";
 import {
   Routes,
@@ -21,9 +23,10 @@ import {
 import { logoutUser, getName, loginUserWithToken } from "./api/sessionManager";
 import Dashboardpage from "./pages/Dashboardpage";
 import { createTheme, responsiveFontSizes } from "@mui/material/styles";
-import Buspage from "./pages/Buspage";
+import Checklistpage from "./pages/Checklistpage";
 import { BusProvider } from "./context/busContext";
 import Scanpage from "./pages/Scanpage";
+import { Logout } from "@mui/icons-material";
 
 type AuthContextType = {
   isAuth: boolean;
@@ -39,9 +42,12 @@ function App() {
   useEffect(() => {
     document.title = "Spotless";
   }, []);
+
   const [isAuth, setIsAuth] = useState(false);
   const [loading, setLoading] = useState(true);
+  const isMobile = useMediaQuery("(max-width:600px)");
 
+  // Handling the login with token
   useEffect(() => {
     const accessToken = localStorage.getItem("access_token") || "";
     loginUserWithToken(accessToken)
@@ -54,7 +60,7 @@ function App() {
       });
   }, [isAuth]);
 
-  // Should be in a separate file if you want to really customize the theme
+  // Create the theme
   let theme = createTheme({
     palette: {
       primary: {
@@ -64,13 +70,28 @@ function App() {
         main: "#5d1e79",
       },
     },
+    typography: {
+      fontFamily: '"Roboto", sans-serif',
+      h5: {
+        fontWeight: 600,
+        letterSpacing: 1.5,
+      },
+      h6: {
+        fontWeight: 500,
+      },
+    },
   });
   theme = responsiveFontSizes(theme);
 
+  // Loading screen
   if (loading)
     return (
-      <Stack alignItems="center">
-        <CircularProgress />
+      <Stack
+        justifyContent="center"
+        alignItems="center"
+        style={{ height: "100vh", width: "100%" }}
+      >
+        <CircularProgress size={60} />
       </Stack>
     );
 
@@ -80,26 +101,52 @@ function App() {
         <BusProvider>
           <div className="App">
             <BrowserRouter>
-              <AppBar position="static" elevation={0}>
+              <AppBar position="sticky" elevation={2}>
                 <Toolbar
-                  style={{ display: "flex", justifyContent: "space-between" }}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    padding: isMobile ? "10px" : "20px",
+                  }}
                 >
                   <Stack spacing={2} direction="row" alignItems="center">
                     <Typography
-                      sx={{ textDecoration: "none", fontWeight: "bold" }}
+                      sx={{
+                        textDecoration: "none",
+                        fontWeight: "bold",
+                        letterSpacing: 2,
+                      }}
                       variant="h5"
                       color="inherit"
                       component={RouterLink}
-                      to="/"
+                      to="/dashboard"
                     >
                       Spotless
                     </Typography>
-                    {isAuth && (
-                      <Typography variant="h6">Welcome {getName()}!</Typography>
-                    )}
                   </Stack>
+
                   <div>
-                    {!isAuth ? (
+                    {isAuth ? (
+                      <Stack spacing={2} direction="row" alignItems="center">
+                        <Typography variant="h6" color="inherit">
+                          Welcome {getName()}!
+                        </Typography>
+                        <IconButton
+                          color="inherit"
+                          component={RouterLink}
+                          to={`/login`}
+                          onClick={() => {
+                            logoutUser()
+                              .then(() => setIsAuth(false))
+                              .catch(() => {
+                                alert("Error logging out, refresh the page!");
+                              });
+                          }}
+                        >
+                          <Logout />
+                        </IconButton>
+                      </Stack>
+                    ) : (
                       <Stack spacing={2} direction="row">
                         <Button
                           className="Button"
@@ -120,35 +167,22 @@ function App() {
                           Register
                         </Button>
                       </Stack>
-                    ) : (
-                      <Stack spacing={2} direction="row">
-                        <Button
-                          variant="contained"
-                          color="secondary"
-                          onClick={() => {
-                            logoutUser()
-                              .then(() => setIsAuth(false))
-                              .catch(() => {
-                                alert("Error logging out, refresh the page!");
-                              });
-                          }}
-                          component={RouterLink}
-                          to="/login"
-                        >
-                          Logout
-                        </Button>
-                      </Stack>
                     )}
                   </div>
                 </Toolbar>
               </AppBar>
+
               <Routes>
+                <Route path="/" element={<Loginpage />} /> {/* Home route */}
                 <Route path="/dashboard" element={<Dashboardpage />} />
-                <Route path="/bus/:bus_id" element={<Buspage />} />
+                <Route
+                  path="/checklist/:schedule_id/:number_plate"
+                  element={<Checklistpage />}
+                />
                 <Route path="/login" element={<Loginpage />} />
                 <Route path="/register" element={<Registerpage />} />
                 <Route
-                  path="/bus/:bus_id/scan/:item_id"
+                  path="/checklist/:schedule_id/:number_plate/scan/:step_id"
                   element={<Scanpage />}
                 />
               </Routes>
