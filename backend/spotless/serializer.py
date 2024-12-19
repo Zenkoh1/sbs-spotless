@@ -49,7 +49,6 @@ class CleaningChecklistItemSerializer(serializers.ModelSerializer):
 
 class CleaningScheduleSerializer(serializers.ModelSerializer):
     cleaners = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all())
-    bus = BusSerializer()
     class Meta:
         model = CleaningSchedule
         fields = '__all__'

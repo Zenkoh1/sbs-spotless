@@ -1,5 +1,5 @@
 from spotless.models import Bus, BusModel, CleaningChecklistStepImages, CleaningChecklistItem, CleaningSchedule, CleaningChecklistStep
-from spotless.serializer import CleaningChecklistItemSerializer, CleaningScheduleSerializer, CleaningChecklistStepSerializer
+from spotless.serializer import CleaningChecklistItemSerializer, CleaningScheduleSerializer, CleaningChecklistStepSerializer, BusSerializer
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import NotFound
@@ -20,6 +20,11 @@ class CleaningScheduleViewSet(viewsets.ModelViewSet):
         queryset = CleaningSchedule.objects.filter(cleaners=request.user)
         
         serializer = CleaningScheduleSerializer(queryset, many=True)
+        # change bus in serializer from key to bus object
+        for schedule in serializer.data:
+            bus = Bus.objects.get(id=schedule['bus'])
+            bus_serializer = BusSerializer(bus)
+            schedule['bus'] = bus_serializer.data
         return Response(serializer.data)
     
 
