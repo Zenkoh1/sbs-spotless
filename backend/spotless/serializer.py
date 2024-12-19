@@ -76,6 +76,34 @@ class CleaningScheduleSerializer(serializers.ModelSerializer):
                 self.validated_data['status'] = CleaningSchedule.StatusType.ASSIGNED
         return super().save(**kwargs)
 
+class CleaningScheduleMassCreateSerializer(serializers.Serializer):
+    buses = serializers.PrimaryKeyRelatedField(many=True, queryset=Bus.objects.all())
+    time = serializers.TimeField()
+    cleaners = serializers.PrimaryKeyRelatedField(many=True, queryset=User.objects.all())
+    cleaning_checklist = serializers.PrimaryKeyRelatedField(queryset=CleaningChecklist.objects.all())
+    start_date = serializers.DateField()
+    end_date = serializers.DateField()
+    interval = serializers.ChoiceField(choices=['weekly', 'monthly'])
+    days_of_week = serializers.ListField(
+        child=serializers.ChoiceField(choices=[
+            "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"
+        ]),
+        required=False
+    )
+    days_of_month = serializers.ListField(
+        child=serializers.IntegerField(min_value=1, max_value=31),
+        required=False
+    )
+
+    def validate(self, data):
+        if data['start_date'] > data['end_date']:
+            raise serializers.ValidationError("Start date must be before end date.")
+        if data['interval'] == 'weekly' and not data.get('days_of_week'):
+            raise serializers.ValidationError("For weekly intervals, days_of_week is required.")
+        if data['interval'] == 'monthly' and not data.get('days_of_month'):
+            raise serializers.ValidationError("For monthly intervals, days_of_month is required.")
+        return data
+
 class CleaningChecklistStepImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = CleaningChecklistStepImages

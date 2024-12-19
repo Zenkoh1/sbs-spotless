@@ -1,10 +1,11 @@
 from spotless.models import CleaningChecklist, BusModel, CleaningChecklistItem, CleaningSchedule, CleaningChecklistStep, CleaningChecklistStepImages
-from spotless.serializer import CleaningChecklistSerializer, CleaningChecklistItemSerializer, CleaningScheduleSerializer, CleaningChecklistStepSerializer
+from spotless.serializer import CleaningChecklistSerializer, CleaningChecklistItemSerializer, CleaningScheduleSerializer, CleaningChecklistStepSerializer, CleaningScheduleMassCreateSerializer
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import NotFound
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 from rest_framework.decorators import action
+import datetime
 
 class CleaningChecklistViewSet(viewsets.ModelViewSet):
     queryset = CleaningChecklist.objects.all()
@@ -48,6 +49,53 @@ class CleaningScheduleViewSet(viewsets.ModelViewSet):
                 cleaning_checklist_item=item
             )
             cleaning_checklist_step.save()
+
+    @action(detail=False, methods=['post'])
+    def mass_create(self, request, pk=None):
+        serializer = CleaningScheduleMassCreateSerializer(data=request.data)
+        if serializer.is_valid():
+            data = serializer.validated_data
+            
+            buses = data.pop('buses')
+            start_date: datetime.date = data.pop('start_date') 
+            end_date: datetime.date = data.pop('end_date')
+            time = data.pop('time') # cleaning start time
+            interval = data.pop('interval')
+            days_of_week = data.pop('days_of_week', [])
+            days_of_month = data.pop('days_of_month', [])
+            schedules_count = 0 # count of schedules created
+
+            if interval == 'weekly':
+                current_date = start_date
+                while current_date <= end_date:
+                    if current_date.strftime("%A").lower() in days_of_week:
+                        for bus in buses:
+                            request.data["datetime"] = datetime.datetime.combine(current_date, time)
+                            request.data["bus"] = bus.pk
+                            individual_serializer = CleaningScheduleSerializer(data=request.data)
+                            if individual_serializer.is_valid():
+                                self.perform_create(individual_serializer)
+                                schedules_count += 1
+                    current_date += datetime.timedelta(days=1)
+
+            elif interval == 'monthly':
+                current_date = start_date
+                while current_date <= end_date:
+                    if current_date.day in days_of_month:
+                        for bus in buses:
+                            request.data["datetime"] = datetime.datetime.combine(current_date, time)
+                            request.data["bus"] = bus.pk
+                            individual_serializer = CleaningScheduleSerializer(data=request.data)
+                            if individual_serializer.is_valid():
+                                self.perform_create(individual_serializer)
+                                schedules_count += 1
+                    current_date += datetime.timedelta(days=1)
+
+            return Response(
+                {"message": f"{schedules_count} schedules created successfully!"},
+                status=status.HTTP_201_CREATED
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
         
