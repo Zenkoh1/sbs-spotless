@@ -68,6 +68,7 @@ class CleaningChecklistStepViewSet(viewsets.ModelViewSet):
             pil_image = PIL.Image.open(image)
             response = model.generate_content([
                 """This is an image of a part of a public transport bus, can you give me a cleanliness percentage (1 - 100),
+                1 being the dirtiest thing you have ever seen and 100 being the cleanest thing you have ever seen,
                 based on how clean this image is, based on things like, but not limited to,
                 dust, seat cushion tearing, dirty floor, litter etc.. You can only, and must provide the number and nothing else (1-100).""", pil_image])
             try:
