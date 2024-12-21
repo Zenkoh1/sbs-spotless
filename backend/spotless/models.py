@@ -102,6 +102,7 @@ class CleaningChecklistStep(models.Model):
 class CleaningChecklistStepImages(models.Model):
     cleaning_checklist_step = models.ForeignKey(CleaningChecklistStep, on_delete=models.CASCADE, related_name='images')
     image = models.ImageField(upload_to="checklist_step_images/")
+    cleanliness_level = models.IntegerField(blank=True, null=True) # Percentage
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     
