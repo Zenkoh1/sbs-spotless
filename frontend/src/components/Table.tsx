@@ -1,6 +1,7 @@
 import { Search, Sort } from "@mui/icons-material";
-import { Container, Box, TextField, TableContainer, Paper, TableBody, TableCell, TableHead, TableRow, Table as MUITable, Icon, InputAdornment, Stack, IconButton, Typography } from "@mui/material";
+import { Container, Box, TextField, TableContainer, Paper, TableBody, TableCell, TableHead, TableRow, Table as MUITable, Icon, InputAdornment, Stack, Typography } from "@mui/material";
 import { useState, useMemo } from "react";
+import { format } from "date-fns";
 
 interface TableProps<T> {
   data: T[];
@@ -88,9 +89,10 @@ const Table = <T extends object> ({ data, columns, onRowClick }: TableProps<T>) 
               <TableRow key={index} onClick={() => onRowClick && onRowClick(row)}>
                 {columns.map((column) => (
                   <TableCell key={String(column.key)}>
+                    {/* FIXME: Workaround until i can get a way to test if typeof(data[0][column.key]) === Date*/}
                     {
-                      row[column.key] instanceof Date ?
-                        new Date(row[column.key] as Date).toLocaleDateString() :
+                      column.key === "created_at" ?
+                        format(row[column.key] as Date, "yyyy-MM-dd") :
                         String(row[column.key])
                     }
                   </TableCell>

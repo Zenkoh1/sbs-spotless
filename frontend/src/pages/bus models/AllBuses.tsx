@@ -1,11 +1,13 @@
 import { Box, Button, Dialog, DialogContent, DialogTitle, Fab, Stack, TextField, Typography } from "@mui/material";
-import { useState, useEffect } from "react";
-import Bus from "../../types/Bus.type";
 import { Add } from "@mui/icons-material";
+import { useState, useEffect } from "react";
 import { retrieveAllBuses, editBus, createBus, deleteBus } from "../../api/buses";
+import Bus from "../../types/Bus.type";
 import Table from "../../components/Table";
+import BusModel from "../../types/BusModel.type";
+import { retrieveAllBusModels } from "../../api/busModels";
 
-const COLUMNS: { key: keyof Bus; label: string; sortable?: boolean }[] = [
+const COLUMNS: { key: any; label: string; sortable?: boolean }[] = [
   { key: "id", label: "ID", sortable: false },
   { key: "number_plate", label: "License Plate", sortable: true },
   { key: "bus_model", label: "Bus Model", sortable: true },
@@ -13,15 +15,19 @@ const COLUMNS: { key: keyof Bus; label: string; sortable?: boolean }[] = [
 ];
 
 type ModalState = 
-  { type: "view" | "edit"; bus: Bus } | 
+  { type: "view" | "edit"; bus: Bus | null } | 
   { type: "create"; bus: null } | 
   null;
 
 const AllBuses = () => {
   const [buses, setBuses] = useState<Bus[]>([]);
+  const [busModels, setBusModels] = useState<BusModel[]>([]);
   const [modalState, setModalState] = useState<ModalState>(null);
 
   const fetchBuses = () => {
+    retrieveAllBusModels()
+      .then(result => setBusModels(result))
+      .catch(error => console.error(error));
     retrieveAllBuses()
       .then(result => setBuses(result))
       .catch(error => console.error(error));
@@ -65,8 +71,13 @@ const AllBuses = () => {
     <Box>
       <Table
         columns={COLUMNS}
-        data={buses}
-        onRowClick={(row) => setModalState({ type: "view", bus: row })}
+        data={buses.map((bus) => {
+          return {
+            ...bus,
+            bus_model: busModels.find(busModel => busModel.id === bus.bus_model)?.name
+          }
+        })}
+        onRowClick={(row) => setModalState({ type: "view", bus: buses.find(b => b.id === row.id) || null })}
       />
       <BusModal
         modalState={modalState}
@@ -74,6 +85,7 @@ const AllBuses = () => {
         onSave={handleSave}
         onDelete={handleDelete}
         onClose={() => setModalState(null)}
+        busModels={busModels}
       />
       <Fab
         color="primary"
@@ -83,7 +95,7 @@ const AllBuses = () => {
           bottom: 16,
           right: 16,
         }}
-        onClick={() => {setModalState({ type: "create", bus: null})}}
+        onClick={() => {setModalState({ type: "create", bus: null })}}
       >
         <Add /> 
       </Fab>
@@ -97,12 +109,14 @@ const BusModal = ({
   onSave,
   onDelete,
   setModalState,
+  busModels
 }: {
   modalState: ModalState;
   onClose: () => void;
   onSave: (bus: Bus) => void;
   onDelete: (busId: number) => void;
   setModalState: (modalState: ModalState) => void;
+  busModels: BusModel[]
 }) => {
   if (!modalState) return null;
 
@@ -112,7 +126,7 @@ const BusModal = ({
     if (!bus) return null;
     return (
       <Dialog onClose={onClose} open>
-        <DialogTitle>{bus.number_plate}</DialogTitle>
+        <DialogTitle>Viewing details of bus {bus.number_plate}</DialogTitle>
         <DialogContent>
           <Typography variant="body1">
             <strong>ID:</strong> {bus.id}
@@ -121,7 +135,7 @@ const BusModal = ({
             <strong>License Plate:</strong> {bus.number_plate}
           </Typography>
           <Typography variant="body1">
-            <strong>Bus model:</strong> {bus.bus_model}
+            <strong>Bus model:</strong> {busModels.find(busModel => busModel.id === bus.bus_model)?.name}
           </Typography>
           <Stack direction="row" spacing={2} mt={2}>
             <Button variant="contained" color="primary" onClick={() => onDelete(bus.id)}>
@@ -138,7 +152,7 @@ const BusModal = ({
 
   return (
     <Dialog onClose={onClose} open>
-      <DialogTitle>{type === "edit" ? "Edit Bus Model" : "Create Bus Model"}</DialogTitle>
+      <DialogTitle>{type === "edit" ? "Edit Bus" : "Create Bus"}</DialogTitle>
       <DialogContent>
         <BusForm
           initialValues={bus || { id: 0, number_plate: "", bus_model: 0 }}

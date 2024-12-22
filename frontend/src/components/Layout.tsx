@@ -10,6 +10,7 @@ const NAV_ITEMS = [
   { label: "Bus Models", icon: <BusAlert />, path: "/busModels" },
   { label: "Buses", icon: <BusAlert />, path: "/buses" },
   { label: "Checklists", icon: <Checklist />, path: "/checklists" },
+  { label: "Schedules", icon: <Checklist />, path: "/schedules" },
   { label: "Settings", icon: <Settings />, path: "/settings" },
 ]
 
@@ -77,7 +78,7 @@ const Topbar = () => {
         }}
       >
         <Typography variant="h6">
-          {location.pathname === "/" ? "Home" : location.pathname.slice(1)}
+          {NAV_ITEMS.find(i => i.path === location.pathname)?.label}
         </Typography>
 
         <Button

@@ -12,6 +12,7 @@
     "@types/testing-library__react": "^10.2.0",
     "axios": "^1.7.9",
     "cra-template-typescript": "1.2.0",
+    "date-fns": "^4.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.0.2",

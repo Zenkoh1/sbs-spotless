@@ -13,13 +13,16 @@ import {
 import { loginUserWithToken } from "./api/sessionManager";
 import { createTheme, responsiveFontSizes } from "@mui/material/styles";
 
-import Login from "./pages/Login";
-import HomePage from "./pages/HomePage";
+import Login from "./pages/misc/Login";
+import HomePage from "./pages/misc/HomePage";
 import Layout from "./components/Layout";
 import AllBusModels from "./pages/bus models/AllBusModels";
 import AllBuses from "./pages/bus models/AllBuses";
 import AllChecklists from "./pages/checklist/AllChecklists";
 import ViewChecklist from "./pages/checklist/ViewChecklist";
+import AllSchedules from "./pages/schedules/AllSchedules";
+import MassSchedule from "./pages/schedules/MassSchedule";
+import NotFound from "./pages/misc/NotFound";
 
 type AuthContextType = {
   isAuth: boolean;
@@ -37,7 +40,7 @@ function App() {
     loginUserWithToken(accessToken)
       .then(() => setIsAuth(true))
       .catch(() => {
-        setIsAuth(false); // FIXME: Set to true for testing
+        setIsAuth(false);
       }).finally(() => {
         setLoading(false);
       });
@@ -86,6 +89,11 @@ function App() {
                 <Route path="/buses" element={<AllBuses />} />
                 <Route path="/checklists" element={<AllChecklists />} />
                 <Route path="/checklists/:id" element={<ViewChecklist />} />
+
+                <Route path="/schedules" element={<AllSchedules />} />
+                <Route path="/schedules/massCreate" element={<MassSchedule />} />
+
+                <Route path="*" element={<NotFound />} />
               </Routes>
             </Layout>
           </BrowserRouter>
