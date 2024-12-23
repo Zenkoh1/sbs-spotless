@@ -1,9 +1,9 @@
 import { Button, Box } from "@mui/material";
 import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import FormTextField from "../components/FormTextField";
-import { loginUser, registerUser } from "../api/sessionManager";
-import { AuthContext } from "../App";
+import FormTextField from "../../components/FormTextField";
+import { loginUser, registerUser } from "../../api/sessionManager";
+import { AuthContext } from "../../App";
 
 /* -------------------------------------- */
 /* This file is not used, user should not */
