@@ -5,6 +5,13 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import NotFound
 from rest_framework import viewsets
 from rest_framework.decorators import action
+import google.generativeai as genai
+import os
+import PIL.Image
+
+genai.configure(api_key=os.environ.get('GOOGLE_API_KEY'))
+
+model = genai.GenerativeModel('gemini-1.5-flash-latest')
 
 '''
 You should be able to operate on schedules that are assigned to you
@@ -58,8 +65,21 @@ class CleaningChecklistStepViewSet(viewsets.ModelViewSet):
         step.images.all().delete()
         # Add new images
         for image in images:
+            pil_image = PIL.Image.open(image)
+            response = model.generate_content([
+                """This is an image of a part of a public transport bus, can you give me a cleanliness percentage (1 - 100),
+                1 being the dirtiest thing you have ever seen and 100 being the cleanest thing you have ever seen,
+                based on how clean this image is, based on things like, but not limited to,
+                dust, seat cushion tearing, dirty floor, litter etc.. You can only, and must provide the number and nothing else (1-100).""", pil_image])
+            try:
+                cleanliness_level = int(response.candidates[0].content.parts[0].text)
+            except ValueError:
+                cleanliness_level = 50
+
             CleaningChecklistStepImages.objects.create(
                 cleaning_checklist_step=step, 
+                cleanliness_level=cleanliness_level,
                 image=image
             )
-        return Response({"detail": "Images uploaded successfully."})
+        cleanliness_levels = [image.cleanliness_level for image in step.images.all()]
+        return Response({"cleanliness_levels": cleanliness_levels}, status=200)

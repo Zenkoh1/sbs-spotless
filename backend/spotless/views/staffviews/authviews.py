@@ -7,6 +7,16 @@ from ...models import User
 from rest_framework_simplejwt.tokens import AccessToken, RefreshToken, TokenError
 from rest_framework import status
 from django.forms.models import model_to_dict
+
+# I'm assuming that all non staff non admin users are cleaners
+class CleanerView(APIView):
+    def get(self, request):
+        cleaners = User.objects.filter(is_staff=False, is_superuser=False)
+        cleaner_list = []
+        for cleaner in cleaners:
+            serializer = UserSerializer(cleaner)
+            cleaner_list.append(serializer.data)
+        return Response(cleaner_list, status=status.HTTP_200_OK)
     
 class RegisterView(APIView):
     def post(self, request):

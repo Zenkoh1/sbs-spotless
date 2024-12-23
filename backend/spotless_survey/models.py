@@ -11,6 +11,7 @@ class CleanlinessSurvey(models.Model):
     )
     comment = models.TextField(blank=True)
     email = models.EmailField()
+    is_resolved = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     

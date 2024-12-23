@@ -33,6 +33,7 @@ staff_urlpatterns = [
     path('login', views.staffviews.LoginView.as_view(), name="login"),
     path('logout', views.staffviews.LogoutView.as_view(), name = "logout"),
     path('loginwithtoken', views.staffviews.LoginwithTokenView.as_view(), name = 'loginwithtoken'),
+    path('cleaners/', views.staffviews.CleanerView.as_view(), name='cleaners'),
     path('', include(staff_router.urls)),
     path('cleaning_checklists/<int:cleaning_checklist_id>/checklist_items/', views.staffviews.CleaningChecklistItemViewSet.as_view({'get': 'list', 'post': 'create'}), name='checklist-items'),
     path('checklist_items/<int:pk>/', views.staffviews.CleaningChecklistItemViewSet.as_view({'get': 'retrieve', 'put': 'update', 'delete': 'destroy', 'patch': 'partial_update'}), name='checklist-items-detail'),

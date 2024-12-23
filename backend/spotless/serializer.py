@@ -107,7 +107,7 @@ class CleaningScheduleMassCreateSerializer(serializers.Serializer):
 class CleaningChecklistStepImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = CleaningChecklistStepImages
-        fields = ['id', 'image', 'created_at']
+        fields = ['id', 'image', "cleanliness_level", 'created_at']
 
 class CleaningChecklistStepSerializer(serializers.ModelSerializer):
     cleaning_checklist_item = CleaningChecklistItemSerializer()
