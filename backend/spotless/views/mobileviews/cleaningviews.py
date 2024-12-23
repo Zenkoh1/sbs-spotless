@@ -8,6 +8,7 @@ from rest_framework.decorators import action
 import google.generativeai as genai
 import os
 import PIL.Image
+from rest_framework import status
 
 genai.configure(api_key=os.environ.get('GOOGLE_API_KEY'))
 
@@ -59,27 +60,40 @@ class CleaningChecklistStepViewSet(viewsets.ModelViewSet):
     def upload_images(self, request, pk=None):
         # Retrieve the instance
         step = self.get_object()
-        # Extract images from the request
-        images = request.FILES.getlist('images')
-        # Remove existing images
-        step.images.all().delete()
-        # Add new images
-        for image in images:
-            pil_image = PIL.Image.open(image)
-            response = model.generate_content([
-                """This is an image of a part of a public transport bus, can you give me a cleanliness percentage (1 - 100),
-                1 being the dirtiest thing you have ever seen and 100 being the cleanest thing you have ever seen,
-                based on how clean this image is, based on things like, but not limited to,
-                dust, seat cushion tearing, dirty floor, litter etc.. You can only, and must provide the number and nothing else (1-100).""", pil_image])
-            try:
-                cleanliness_level = int(response.candidates[0].content.parts[0].text)
-            except ValueError:
-                cleanliness_level = 50
+        # Extract single image from the request
+        image = request.FILES.getlist('images')
+        assert image.count() == 1
+        # Add new image to the step
+        pil_image = PIL.Image.open(image)
+        response = model.generate_content([
+            """This is an image of a part of a public transport bus, can you give me a cleanliness percentage (1 - 100),
+            1 being the dirtiest thing you have ever seen and 100 being the cleanest thing you have ever seen,
+            based on how clean this image is, based on things like, but not limited to,
+            dust, seat cushion tearing, dirty floor, litter etc.. You can only, and must provide the number and nothing else (1-100).""", pil_image])
+        try:
+            cleanliness_level = int(response.candidates[0].content.parts[0].text)
+        except ValueError:
+            cleanliness_level = 50
 
-            CleaningChecklistStepImages.objects.create(
-                cleaning_checklist_step=step, 
-                cleanliness_level=cleanliness_level,
-                image=image
-            )
-        cleanliness_levels = [image.cleanliness_level for image in step.images.all()]
-        return Response({"cleanliness_levels": cleanliness_levels}, status=200)
+        new_image = CleaningChecklistStepImages.objects.create(
+            cleaning_checklist_step=step, 
+            cleanliness_level=cleanliness_level,
+            image=image
+        )
+
+        return Response({"cleanliness_level": cleanliness_level, "image_id": new_image.pk}, status=200)
+    
+    @action(detail=True, methods=['delete'])
+    def delete_image(self, request, pk=None):
+        step = self.get_object()
+        image_id = request.data.get('image_id')
+        
+        if not image_id:
+            return Response({"error": "Image ID is required"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            image_instance = CleaningChecklistStepImages.objects.get(id=image_id, cleaning_checklist_step=step)
+            image_instance.delete()
+            return Response({"message": "Image deleted successfully"}, status=status.HTTP_204_NO_CONTENT)
+        except CleaningChecklistStepImages.DoesNotExist:
+            return Response({"error": "Image not found"}, status=status.HTTP_404_NOT_FOUND)

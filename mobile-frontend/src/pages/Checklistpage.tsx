@@ -3,10 +3,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../App";
 import Checklist from "../components/Checklist";
 import useAPI from "../api/useAPI";
-import { CleaningChecklistStep_Backend_Type } from "../types/CleaningSchedule.type";
-import { Button } from "@mui/material";
+import {
+  CleaningChecklistStep_Backend_Type,
+  CleaningSchedule_Backend_Type,
+} from "../types/CleaningSchedule.type";
+import { Badge, Button, Typography } from "@mui/material";
 import axios from "axios";
 import { BACKEND_URL } from "../constants";
+import { PriorityHigh } from "@mui/icons-material";
 
 export default function Checklistpage() {
   const { schedule_id, number_plate } = useParams();
@@ -19,10 +23,28 @@ export default function Checklistpage() {
     CleaningChecklistStep_Backend_Type[]
   >(`cleaning_schedules/${schedule_id}/checklist_steps`);
 
+  const [schedule, setSchedule] = useState<CleaningSchedule_Backend_Type>();
+
   useEffect(() => {
     if (!isAuth) {
       console.log("Not authenticated");
       navigate("/login");
+    }
+    try {
+      const fetchSchedule = async () => {
+        const scheduleResponse = await axios.get(
+          `${BACKEND_URL}cleaning_schedules/${schedule_id}/`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            },
+          }
+        );
+        setSchedule(scheduleResponse.data);
+      };
+      fetchSchedule();
+    } catch (error) {
+      console.error(error);
     }
     fetchAPI();
     if (!loading) {
@@ -52,9 +74,46 @@ export default function Checklistpage() {
     }
   };
 
+  const [surveyResults, setSurveyResults] = useState<number>(0);
+  const getSurveyResults = async () => {
+    try {
+      const surveyResponse = await axios.get(
+        `${process.env.REACT_SURVEY_BACKEND_URL}/survey/bus/${schedule?.bus.id}/`,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
     <div style={{ marginTop: 10 }}>
-      <Checklist number_plate={number_plate!} checklist={cleanDetails!} />
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-around",
+          alignItems: "center",
+          marginBottom: 10,
+        }}
+      >
+        <Typography variant="h5">{number_plate}'s Checklist</Typography>
+
+        <Button>
+          <Badge
+            badgeContent={surveyResults}
+            color="error"
+            overlap="rectangular"
+            showZero
+          >
+            <PriorityHigh style={{ color: "black" }} />
+          </Badge>
+        </Button>
+      </div>
+      <Checklist checklist={cleanDetails!} />
       <Button
         style={{ marginTop: 10 }}
         variant={

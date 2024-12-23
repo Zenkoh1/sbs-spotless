@@ -20,6 +20,11 @@ mobile_urlpatterns = [
         views.mobileviews.CleaningChecklistStepViewSet.as_view({'patch': 'upload_images'}),
         name='checklist-steps-upload-images',
     ),
+    path(
+        'checklist_steps/<int:pk>/delete_image/',
+        views.mobileviews.CleaningChecklistStepViewSet.as_view({'delete': 'delete_image'}),
+        name='checklist-steps-delete-image',
+    ),
 ]
 
 staff_router = DefaultRouter()

@@ -6,7 +6,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
   Paper,
   Link,
   CircularProgress,
@@ -17,14 +16,10 @@ import { Link as RouterLink } from "react-router-dom";
 import { CleaningChecklistStep_Backend_Type } from "../types/CleaningSchedule.type";
 
 export default function Checklist(props: {
-  number_plate: string;
   checklist: CleaningChecklistStep_Backend_Type[];
 }) {
   return (
     <Box>
-      <Typography variant="h5" marginBottom={2}>
-        Checklist for Bus {props.number_plate}
-      </Typography>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>

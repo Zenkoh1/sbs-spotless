@@ -32,7 +32,8 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# add in your own ip address when you are using the mobile frontend
+ALLOWED_HOSTS = ['10.0.0.22', 'localhost']
 
 
 # Application definition
