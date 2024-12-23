@@ -45,6 +45,7 @@ const SingleScheduleForm = ({
             d.setMinutes((time || new Date()).getMinutes());
             setFormState({ ...formState, datetime: d });
           }}
+          sx={{ width: "100%" }}
         />
 
         <Autocomplete
