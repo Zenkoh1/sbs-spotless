@@ -1,18 +1,24 @@
 import { useEffect, useState } from "react";
 import Schedule from "../../types/Schedule.type";
 import { createSingleSchedule, retrieveAllSchedules, ScheduleSingle } from "../../api/schedules";
-import { Box, Button, Fab, IconButton, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
+import { Box, Fab, IconButton, List, ListItem, ListItemText, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
 import { format, subDays, addDays } from "date-fns";
 import Bus from "../../types/Bus.type";
 import { retrieveAllBuses } from "../../api/buses";
 import { useNavigate } from "react-router-dom";
 import SingleScheduleForm from "./SingleScheduleForm";
-import { ArrowBack, ArrowForward, List } from "@mui/icons-material";
+import { Add, ArrowBack, ArrowForward, List as ListIcon } from "@mui/icons-material";
+import Checklist from "../../types/Checklist.type";
+import User from "../../types/User.type";
+import { retrieveAllChecklists } from "../../api/checklists";
+import { retrieveAllCleaners } from "../../api/staff";
 
 const AllSchedules = () => {
   const [schedules, setSchedules] = useState<Schedule[]>([]);
   const [startDate, setStartDate] = useState<Date>(new Date());
   const [buses, setBuses] = useState<Bus[]>([]);
+  const [cleaners, setCleaners] = useState<User[]>([]);
+  const [cleaningChecklists, setCleaningChecklists] = useState<Checklist[]>([]);
 
   const [singleScheduleForm, setSingleScheduleForm] = useState<{isOpen: boolean, bus: Bus | null, datetime: Date}>({ isOpen: false, bus: null, datetime: new Date() });
 
@@ -25,24 +31,29 @@ const AllSchedules = () => {
     retrieveAllBuses()
       .then(result => setBuses(result))
       .catch(error => console.error(error));
+    retrieveAllCleaners()
+      .then(result => setCleaners(result))
+      .catch(error => console.error(error));
+    retrieveAllChecklists()
+      .then(result => setCleaningChecklists(result))
+      .catch(error => console.error(error));
   }, []);
 
   const handleScheduleSingle = (values: ScheduleSingle) => {
     createSingleSchedule(values)
       .then(result => {
         setSchedules([ ...schedules, result ]);
+        setSingleScheduleForm({ ...singleScheduleForm, isOpen: false });
       })
       .catch(error => console.error(error))
   }
 
-  // TODO: Add "Schedule now" button to schedule a bus for a specific day
   // TODO: Add "View details" button to view/edit the schedule details
   // TODO: Add "Delete" button to delete the schedule
-  // TODO: Add mass schedule option
 
   // Helper: Group schedules by bus and day
   const getWeeklySchedule = () => {
-    const days = Array.from({ length: 7 }, (_, i) => {
+    const days = Array.from({ length: 5 }, (_, i) => {
       const date = addDays(startDate, i);
       return {
         date,
@@ -50,12 +61,12 @@ const AllSchedules = () => {
       };
     });
 
-    const busesWithSchedules: Record<number, Record<string, Schedule | null>> = {};
+    const busesWithSchedules: Record<number, Record<string, Schedule[]>> = {};
 
     buses.forEach(bus => {
       busesWithSchedules[bus.id] = {};
       days.forEach(day => {
-        busesWithSchedules[bus.id][day.formatted] = null;
+        busesWithSchedules[bus.id][day.formatted] = [];
       });
     });
 
@@ -64,7 +75,10 @@ const AllSchedules = () => {
       const dayKey = format(new Date(schedule.datetime), "yyyy-MM-dd");
 
       if (busesWithSchedules[busId]) {
-        busesWithSchedules[busId][dayKey] = schedule;
+        if (!busesWithSchedules[busId][dayKey]) {
+          busesWithSchedules[busId][dayKey] = [];
+        }
+        busesWithSchedules[busId][dayKey] = [...busesWithSchedules[busId][dayKey], schedule];
       }
     });
 
@@ -103,22 +117,22 @@ const AllSchedules = () => {
               <TableCell>{buses.find(bus => bus.id === parseInt(busId))?.number_plate}</TableCell>
               {days.map(day => (
                 <TableCell key={day.formatted}>
-                  {scheduleByDay[day.formatted] ? (
-                    <>
-                      <Typography variant="body2">
-                        Status: {scheduleByDay[day.formatted]?.status}
-                      </Typography>
-                      <Typography variant="body2">
-                        Cleaners: {scheduleByDay[day.formatted]?.cleaners.join(", ") || "None"}
-                      </Typography>
-                    </>
+                  {scheduleByDay[day.formatted].length > 0 ? (
+                    <List>
+                      {scheduleByDay[day.formatted].map(schedule => (
+                        <ListItem key={schedule.id}>
+                          <ListItemText primary={format(new Date(schedule.datetime), "HH:mm")} />
+                          <ListItemText primary={cleaningChecklists.find(c => c.id === schedule.cleaning_checklist)?.title || ""} />
+                          <ListItemText primary={schedule.cleaners.map(cleaner => cleaners.find(c => c.id === cleaner)?.name || "").join(", ")} />
+                        </ListItem>
+                      ))}
+                    </List>
                   ) : (
-                    <Button 
+                    <IconButton
                       onClick={() => setSingleScheduleForm({ isOpen: true, bus: buses.filter(b => b.id === parseInt(busId))[0], datetime: day.date })}
-                      variant="contained"
                     >
-                      Schedule
-                    </Button>
+                      <Add />
+                    </IconButton>
                   )}
                 </TableCell>
               ))}
@@ -136,6 +150,8 @@ const AllSchedules = () => {
           onClose={() => setSingleScheduleForm({ ...singleScheduleForm, isOpen: false })}
           onSubmit={handleScheduleSingle}
           open={singleScheduleForm.isOpen}
+          cleaners={cleaners}
+          cleaningChecklists={cleaningChecklists}
         />
       }
 
@@ -149,7 +165,7 @@ const AllSchedules = () => {
         }}
         onClick={() => {navigate("massCreate")}}
       >
-        <List /> 
+        <ListIcon /> 
       </Fab>
     </Box>
   );

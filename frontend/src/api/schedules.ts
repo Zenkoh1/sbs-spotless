@@ -35,7 +35,7 @@ export function createSingleSchedule(schedule: ScheduleSingle): Promise<Schedule
   ).then((response) => response.data);
 }
 
-type DayOfWeek = "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday";
+export type DayOfWeek = "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday";
 
 export type ScheduleMass = {
   buses: number[],

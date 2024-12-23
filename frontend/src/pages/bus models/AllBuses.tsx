@@ -1,4 +1,4 @@
-import { Box, Button, Dialog, DialogContent, DialogTitle, Fab, Stack, TextField, Typography } from "@mui/material";
+import { Autocomplete, Box, Button, Dialog, DialogContent, DialogTitle, Fab, Stack, TextField, Typography } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import { useState, useEffect } from "react";
 import { retrieveAllBuses, editBus, createBus, deleteBus } from "../../api/buses";
@@ -158,6 +158,7 @@ const BusModal = ({
           initialValues={bus || { id: 0, number_plate: "", bus_model: 0 }}
           onSubmit={onSave}
           onCancel={onClose}
+          busModels={busModels}
         />
       </DialogContent>
     </Dialog>
@@ -168,10 +169,12 @@ const BusForm = ({
   initialValues,
   onSubmit,
   onCancel,
+  busModels
 }: {
   initialValues: Bus;
   onSubmit: (busModel: Bus) => void;
   onCancel: () => void;
+  busModels: BusModel[]
 }) => {
   const [formState, setFormState] = useState(initialValues);
 
@@ -187,12 +190,12 @@ const BusForm = ({
         value={formState.number_plate}
         onChange={handleChange("number_plate")}
       />
-      <TextField
-        label="Bus Model"
-        fullWidth
-        margin="normal"
-        value={formState.bus_model}
-        onChange={handleChange("bus_model")}
+      <Autocomplete
+        options={busModels}
+        getOptionLabel={(option) => option.name}
+        value={busModels.find(busModel => busModel.id === formState.bus_model) || null}
+        onChange={(_, value) => setFormState({ ...formState, bus_model: value?.id || 0 })}
+        renderInput={(params) => <TextField {...params} label="Bus Model" />}
       />
       <Stack direction="row" spacing={2} mt={2}>
         <Button
