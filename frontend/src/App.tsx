@@ -20,6 +20,7 @@ import AllBusModels from "./pages/bus models/AllBusModels";
 import AllBuses from "./pages/bus models/AllBuses";
 import AllChecklists from "./pages/checklist/AllChecklists";
 import ViewChecklist from "./pages/checklist/ViewChecklist";
+import AllCleaners from "./pages/cleaners/AllCleaners";
 
 type AuthContextType = {
   isAuth: boolean;
@@ -86,6 +87,7 @@ function App() {
                 <Route path="/buses" element={<AllBuses />} />
                 <Route path="/checklists" element={<AllChecklists />} />
                 <Route path="/checklists/:id" element={<ViewChecklist />} />
+                <Route path="/cleaners" element={<AllCleaners />} />
               </Routes>
             </Layout>
           </BrowserRouter>
