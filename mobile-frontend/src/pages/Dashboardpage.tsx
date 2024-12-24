@@ -66,7 +66,6 @@ const Dashboardpage = () => {
         (a, b) => a.datetime.getTime() - b.datetime.getTime()
       );
       setSchedules(groupedSchedules);
-      // console.log(groupedSchedules);
     }
   }, [isAuth, loading]);
 

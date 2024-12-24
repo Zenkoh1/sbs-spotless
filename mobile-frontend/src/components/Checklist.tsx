@@ -6,7 +6,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
   Paper,
   Link,
   CircularProgress,
@@ -15,16 +14,32 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { Link as RouterLink } from "react-router-dom";
 import { CleaningChecklistStep_Backend_Type } from "../types/CleaningSchedule.type";
+import { BACKEND_URL } from "../constants";
+import axios from "axios";
 
 export default function Checklist(props: {
-  number_plate: string;
   checklist: CleaningChecklistStep_Backend_Type[];
 }) {
+  const { checklist } = props;
+  const updateStatus = async (step_id: number) => {
+    try {
+      const response = await axios.patch(
+        `${BACKEND_URL}checklist_steps/${step_id}/`,
+        {
+          status: "IN_PROGRESS",
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <Box>
-      <Typography variant="h5" marginBottom={2}>
-        Checklist for Bus {props.number_plate}
-      </Typography>
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
@@ -35,8 +50,8 @@ export default function Checklist(props: {
             </TableRow>
           </TableHead>
           <TableBody>
-            {props.checklist &&
-              props.checklist.map((item) => (
+            {checklist &&
+              checklist.map((item) => (
                 <TableRow key={item.id}>
                   <TableCell>{item.cleaning_checklist_item.title}</TableCell>
                   <TableCell>
@@ -53,6 +68,7 @@ export default function Checklist(props: {
                   <TableCell>
                     {item.status !== "COMPLETE" && (
                       <Link
+                        onClick={() => updateStatus(item.id)}
                         component={RouterLink}
                         to={`scan/${item.id}`}
                         underline="hover"

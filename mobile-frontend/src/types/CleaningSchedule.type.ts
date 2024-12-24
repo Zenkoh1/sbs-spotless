@@ -3,7 +3,7 @@ export type CleaningChecklistItem_Backend_Type = {
   title: string;
   description: string;
   order: number;
-  image: string | null; // If no image is provided, it will be `null`
+  image: ImageProps | null; // If no image is provided, it will be `null`
   is_image_required: boolean;
   created_at: string;
   updated_at: string;
@@ -13,7 +13,7 @@ export type CleaningChecklistItem_Backend_Type = {
 export type CleaningChecklistStep_Backend_Type = {
   id: number;
   cleaning_checklist_item: CleaningChecklistItem_Backend_Type;
-  images: string[]; // Array of image URLs or paths
+  images: ImageProps[]; // Array of image URLs or paths
   status: "IN_PROGRESS" | "COMPLETE" | "INCOMPLETE";
   created_at: string;
   updated_at: string;
@@ -43,4 +43,22 @@ export type CleaningSchedule_Backend_Type = {
 export type CleaningSchedule_Frontend_Type = {
   datetime: Date;
   schedules: CleaningSchedule_Backend_Type[];
+};
+
+export type CleanlinessSurvey_Backend_Type = {
+  id: number;
+  bus: number;
+  rating: number;
+  comment: string;
+  email: string;
+  images: ImageProps[]; // might change to image objects
+  created_at: string;
+  updated_at: string;
+};
+
+export type ImageProps = {
+  cleanliness_level: number;
+  created_at: string;
+  id: number;
+  image: string;
 };

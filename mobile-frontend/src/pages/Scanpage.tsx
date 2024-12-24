@@ -11,53 +11,122 @@ import {
 } from "@mui/material";
 import ReplayIcon from "@mui/icons-material/Replay";
 import DeleteIcon from "@mui/icons-material/Delete";
-import CancelIcon from "@mui/icons-material/Cancel";
 import useAPI from "../api/useAPI";
-import { CleaningChecklistStep_Backend_Type } from "../types/CleaningSchedule.type";
+import {
+  CleaningChecklistStep_Backend_Type,
+  ImageProps,
+} from "../types/CleaningSchedule.type";
 import axios from "axios";
 import { BACKEND_URL } from "../constants";
 
 function ScannedImageComponent(props: {
   img: ImageObjectType;
   index: number;
-  imageToReplaceIndex: number | null;
-  setImageToReplaceIndex: React.Dispatch<React.SetStateAction<number | null>>;
+  image: ImageProps;
+  step_id: string;
+  imageToReplaceIndex: { index: number; image_id: string } | null;
+  setImageToReplaceIndex: React.Dispatch<
+    React.SetStateAction<{ index: number; image_id: string } | null>
+  >;
   handleDeleteImage: (index: number) => void;
 }) {
   const {
     img,
     index,
+    image,
+    step_id,
     imageToReplaceIndex,
     setImageToReplaceIndex,
     handleDeleteImage,
   } = props;
-  const [rating, setRating] = useState<number>();
   const isAuth = useContext(AuthContext);
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [response, setResponse] = useState<{
+    cleanliness_level: number;
+    image_id: string;
+  }>();
 
-  const { fetchAPI, loading, data } = useAPI<number>(`scanimage`);
+  const uploadImage = async () => {
+    try {
+      const formData = new FormData();
+      formData.append("image", img.imageFile);
+      const response = await axios.patch(
+        `${BACKEND_URL}checklist_steps/${step_id}/upload_image/`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
+      if (response.status === 200) {
+        console.log("Image uploaded successfully", response.data);
+        const data = await response.data;
+        setResponse(data);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Error uploading image, refresh page");
+    }
+  };
+
+  const deleteImage = async () => {
+    try {
+      const deleteResponse = await axios.delete(
+        `${BACKEND_URL}checklist_steps/${step_id}/delete_image/`,
+        {
+          data: { image_id: response?.image_id },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          },
+        }
+      );
+      if (deleteResponse.status === 204) {
+        handleDeleteImage(index);
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Error deleting image, refresh page");
+    }
+  };
+
+  const replaceImage = async () => {
+    setImageToReplaceIndex(
+      imageToReplaceIndex?.index === index
+        ? null
+        : { index, image_id: response?.image_id || "" }
+    );
+  };
 
   useEffect(() => {
     if (!isAuth) {
       console.log("User is not authenticated, redirecting to login page");
       navigate("/login");
     }
-    if (!loading) {
-      console.log(data);
-      setRating(data!);
+    if (image == null) {
+      uploadImage();
+    } else {
+      setLoading(false);
+      setResponse({
+        cleanliness_level: image.cleanliness_level,
+        image_id: image.id.toString(),
+      });
     }
-  }, [isAuth, loading]);
+  }, [isAuth]);
 
   return (
     <Box
       key={index}
       position="relative"
       sx={{
-        border: imageToReplaceIndex === index ? "2px solid #1976d2" : "none",
+        border:
+          imageToReplaceIndex?.index === index ? "2px solid #1976d2" : "none",
         borderRadius: "8px",
         padding: "8px",
         backgroundColor:
-          imageToReplaceIndex === index ? "#e3f2fd" : "transparent",
+          imageToReplaceIndex?.index === index ? "#e3f2fd" : "transparent",
         boxShadow: "0 2px 8px rgba(0, 0, 0, 0.1)",
         display: "flex",
         alignItems: "center",
@@ -83,8 +152,8 @@ function ScannedImageComponent(props: {
           <CircularProgress size={24} />
         ) : (
           <Typography variant="body2" noWrap>
-            {rating !== null
-              ? `Cleanliness Rating: ${rating}/100`
+            {response !== null
+              ? `Cleanliness: ${response?.cleanliness_level}/100`
               : "Rating not available"}
           </Typography>
         )}
@@ -92,21 +161,15 @@ function ScannedImageComponent(props: {
 
       {/* Retake Icon */}
       <IconButton
-        color={imageToReplaceIndex === index ? "secondary" : "primary"}
-        onClick={() =>
-          setImageToReplaceIndex(imageToReplaceIndex === index ? null : index)
-        }
+        color={imageToReplaceIndex?.index === index ? "secondary" : "primary"}
+        onClick={replaceImage}
         sx={{ flexShrink: 0 }}
       >
         <ReplayIcon />
       </IconButton>
 
       {/* Delete Icon */}
-      <IconButton
-        color="error"
-        onClick={() => handleDeleteImage(index)}
-        sx={{ flexShrink: 0 }}
-      >
+      <IconButton color="error" onClick={deleteImage} sx={{ flexShrink: 0 }}>
         <DeleteIcon />
       </IconButton>
     </Box>
@@ -124,9 +187,17 @@ export default function Scanpage() {
   const [step, setStep] = useState<CleaningChecklistStep_Backend_Type>();
 
   const [images, setImages] = useState<ImageObjectType[]>([]);
-  const [imageToReplaceIndex, setImageToReplaceIndex] = useState<number | null>(
-    null
-  );
+  const [imageToReplaceIndex, setImageToReplaceIndex] = useState<{
+    index: number;
+    image_id: string;
+  } | null>(null);
+
+  const createFileFromURL = async (url: string, filename: string) => {
+    const response = await fetch(url);
+    const blob = await response.blob(); // Get the image data as a Blob
+    const file = new File([blob], filename, { type: blob.type }); // Create a File object from the Blob
+    return file;
+  };
 
   useEffect(() => {
     if (!isAuth) {
@@ -135,25 +206,44 @@ export default function Scanpage() {
     }
     fetchAPI();
     if (!loading) {
-      console.log(data);
+      console.log("step", data);
       setStep(data!);
+
+      // Adding images to the images array
+      if (data && data.images && data.images.length > 0) {
+        const fetchedImages = data.images.map(async (imageData: ImageProps) => {
+          const imageUrl = `${imageData.image}`; // The URL where the image is hosted
+          const filename = imageData.image.split("/").pop(); // Extract filename from URL
+
+          // Create a File object from the URL
+          const imageFile = await createFileFromURL(imageUrl, filename!);
+
+          return {
+            imagePreview: imageUrl,
+            imageFile, // The actual File object
+          };
+        });
+
+        // Await the creation of all image files and update the state
+        Promise.all(fetchedImages).then((images) => setImages(images));
+      }
     }
   }, [isAuth, loading]);
 
   const handleDeleteImage = (index: number) => {
     setImages((prev) => prev.filter((_, i) => i !== index));
     // Reset the retake mode if the deleted image is the one being replaced
-    if (imageToReplaceIndex === index) {
+    if (imageToReplaceIndex?.index === index) {
       setImageToReplaceIndex(null);
     }
   };
 
-  const submitImages = async () => {
+  const updateCleaned = async () => {
     try {
-      const uploadImageResponse = await axios.patch(
-        `${BACKEND_URL}checklist_steps/${step_id}/upload_images/`,
+      const updateStatusResponse = await axios.patch(
+        `${BACKEND_URL}checklist_steps/${step_id}/`,
         {
-          images: images.map((img) => img.imageFile),
+          status: "COMPLETE",
         },
         {
           headers: {
@@ -161,25 +251,12 @@ export default function Scanpage() {
           },
         }
       );
-      if (uploadImageResponse.status === 200) {
-        const updateStatusResponse = await axios.patch(
-          `${BACKEND_URL}checklist_steps/${step_id}/`,
-          {
-            status: "COMPLETE",
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-            },
-          }
-        );
-        if (updateStatusResponse.status === 200) {
-          navigate(`/checklist/${schedule_id}/${number_plate}`);
-        }
+      if (updateStatusResponse.status === 200) {
+        navigate(`/checklist/${schedule_id}/${number_plate}`);
       }
     } catch (error) {
       console.error(error);
-      alert("Error submitting images, refresh page");
+      alert("Error updating cleaned, refresh page");
     }
   };
 
@@ -188,8 +265,8 @@ export default function Scanpage() {
       <h1>{step?.cleaning_checklist_item.title}</h1>
       <img
         src={
-          step?.cleaning_checklist_item.image
-            ? step.cleaning_checklist_item.image
+          step?.cleaning_checklist_item.image?.image
+            ? step.cleaning_checklist_item.image.image
             : "https://via.placeholder.com/150"
         }
         alt="Image of item to clean"
@@ -198,6 +275,7 @@ export default function Scanpage() {
         {step?.cleaning_checklist_item.description}
       </Typography>
       <UploadImageComponent
+        step_id={step_id!}
         images={images}
         setImages={setImages}
         imageToReplaceIndex={imageToReplaceIndex}
@@ -208,7 +286,9 @@ export default function Scanpage() {
           <ScannedImageComponent
             key={img.imageFile.name}
             img={img}
+            image={step?.images[index]!}
             index={index}
+            step_id={step_id!}
             imageToReplaceIndex={imageToReplaceIndex}
             setImageToReplaceIndex={setImageToReplaceIndex}
             handleDeleteImage={handleDeleteImage}
@@ -226,7 +306,7 @@ export default function Scanpage() {
             ? false
             : true
         }
-        onClick={submitImages}
+        onClick={updateCleaned}
       >
         Cleaned
       </Button>
@@ -243,18 +323,29 @@ type ImageObjectType = {
  * UploadImageComponent handles image upload and previews, including retakes.
  */
 const UploadImageComponent: React.FC<{
+  step_id: string;
   images: ImageObjectType[];
   setImages: React.Dispatch<React.SetStateAction<ImageObjectType[]>>;
-  imageToReplaceIndex: number | null;
-  setImageToReplaceIndex: React.Dispatch<React.SetStateAction<number | null>>;
-}> = ({ images, setImages, imageToReplaceIndex, setImageToReplaceIndex }) => {
+  imageToReplaceIndex: { index: number; image_id: string } | null;
+  setImageToReplaceIndex: React.Dispatch<
+    React.SetStateAction<{ index: number; image_id: string } | null>
+  >;
+}> = ({
+  step_id,
+  images,
+  setImages,
+  imageToReplaceIndex,
+  setImageToReplaceIndex,
+}) => {
   const handleFileInput = useRef<HTMLInputElement | null>(null);
 
   const handleClick = () => {
     handleFileInput.current?.click();
   };
 
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = event.target.files?.[0];
     if (file) {
       const newImage = {
@@ -265,9 +356,28 @@ const UploadImageComponent: React.FC<{
       if (imageToReplaceIndex !== null) {
         // Replace the selected image
         const updatedImages = [...images];
-        updatedImages[imageToReplaceIndex] = newImage;
+        updatedImages[imageToReplaceIndex.index] = newImage;
         setImages(updatedImages);
         setImageToReplaceIndex(null); // Reset after replacing
+
+        // delete old image from backend
+        try {
+          const deleteResponse = axios.delete(
+            `${BACKEND_URL}checklist_steps/${step_id}/delete_image/`,
+            {
+              data: { image_id: imageToReplaceIndex?.image_id },
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+              },
+            }
+          );
+          if ((await deleteResponse).status === 204) {
+            console.log("Image deleted successfully");
+          }
+        } catch (error) {
+          console.error(error);
+          alert("Error deleting image, refresh page");
+        }
       } else {
         // Add a new image
         setImages([...images, newImage]);

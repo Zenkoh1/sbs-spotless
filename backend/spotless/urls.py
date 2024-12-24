@@ -16,9 +16,14 @@ mobile_urlpatterns = [
     path('cleaning_schedules/<int:cleaning_schedule_id>/checklist_steps/', views.mobileviews.CleaningChecklistStepViewSet.as_view({'get': 'list'}), name='checklist-steps'),
     path('checklist_steps/<int:pk>/', views.mobileviews.CleaningChecklistStepViewSet.as_view({'get': 'retrieve', 'put': 'update', 'patch': 'partial_update'}), name='checklist-steps-detail'),
     path(
-        'checklist_steps/<int:pk>/upload_images/',
-        views.mobileviews.CleaningChecklistStepViewSet.as_view({'patch': 'upload_images'}),
-        name='checklist-steps-upload-images',
+        'checklist_steps/<int:pk>/upload_image/',
+        views.mobileviews.CleaningChecklistStepViewSet.as_view({'patch': 'upload_image'}),
+        name='checklist-steps-upload-image',
+    ),
+    path(
+        'checklist_steps/<int:pk>/delete_image/',
+        views.mobileviews.CleaningChecklistStepViewSet.as_view({'delete': 'delete_image'}),
+        name='checklist-steps-delete-image',
     ),
 ]
 
