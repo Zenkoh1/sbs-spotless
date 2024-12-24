@@ -8,13 +8,6 @@ import Schedule from "../../types/Schedule.type";
 import { Step } from "../../types/Step.type";
 import { BACKEND_URL } from "../../constants";
 
-const createFileFromURL = async (url: string, filename: string) => {
-  const response = await fetch(url);
-  const blob = await response.blob(); // Get the image data as a Blob
-  const file = new File([blob], filename, { type: blob.type }); // Create a File object from the Blob
-  return file;
-};
-
 const ViewSchedule = () => {
   const { id } = useParams<{ id: string }>();
   const [schedule, setSchedule] = useState<Schedule>();
