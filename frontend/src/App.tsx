@@ -1,19 +1,11 @@
 import "./App.css";
 import React, { useEffect, useState, createContext } from "react";
-import {
-  Stack,
-  ThemeProvider,
-  CircularProgress,
-} from "@mui/material";
-import {
-  Routes,
-  Route,
-  BrowserRouter,
-} from "react-router-dom";
+import { Stack, ThemeProvider, CircularProgress } from "@mui/material";
+import { Routes, Route, BrowserRouter } from "react-router-dom";
 import { loginUserWithToken } from "./api/sessionManager";
 import { createTheme, responsiveFontSizes } from "@mui/material/styles";
 import { LocalizationProvider } from "@mui/x-date-pickers";
-import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFnsV3';
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFnsV3";
 
 import Login from "./pages/misc/Login";
 import HomePage from "./pages/misc/HomePage";
@@ -26,13 +18,17 @@ import AllCleaners from "./pages/cleaners/AllCleaners";
 import AllSchedules from "./pages/schedules/AllSchedules";
 import MassSchedule from "./pages/schedules/MassSchedule";
 import NotFound from "./pages/misc/NotFound";
+import ViewSchedule from "./pages/schedules/ViewSchedule";
 
 type AuthContextType = {
   isAuth: boolean;
   setIsAuth: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-export const AuthContext = createContext<AuthContextType>({isAuth: false, setIsAuth: () => {}});
+export const AuthContext = createContext<AuthContextType>({
+  isAuth: false,
+  setIsAuth: () => {},
+});
 
 function App() {
   const [isAuth, setIsAuth] = useState(false);
@@ -44,7 +40,8 @@ function App() {
       .then(() => setIsAuth(true))
       .catch(() => {
         setIsAuth(false);
-      }).finally(() => {
+      })
+      .finally(() => {
         setLoading(false);
       });
   }, [isAuth]);
@@ -72,9 +69,9 @@ function App() {
               <Login />
             </BrowserRouter>
           </div>
-      </AuthContext.Provider>
-    </ThemeProvider>
-    )
+        </AuthContext.Provider>
+      </ThemeProvider>
+    );
   }
 
   return (
@@ -89,24 +86,17 @@ function App() {
                   <Route path="/" element={<HomePage />} />
                   <Route path="/login" element={<Login />} />
 
-                <Route path="/busModels" element={<AllBusModels />} />
-                <Route path="/buses" element={<AllBuses />} />
-                <Route path="/checklists" element={<AllChecklists />} />
-                <Route path="/checklists/:id" element={<ViewChecklist />} />
-                <Route path="/cleaners" element={<AllCleaners />} />
-              </Routes>
-            </Layout>
-          </BrowserRouter>
-        </div>
-      </AuthContext.Provider>
-    </ThemeProvider>
                   <Route path="/busModels" element={<AllBusModels />} />
                   <Route path="/buses" element={<AllBuses />} />
                   <Route path="/checklists" element={<AllChecklists />} />
                   <Route path="/checklists/:id" element={<ViewChecklist />} />
-
+                  <Route path="/cleaners" element={<AllCleaners />} />
                   <Route path="/schedules" element={<AllSchedules />} />
-                  <Route path="/schedules/massCreate" element={<MassSchedule />} />
+                  <Route path="/schedules/:id" element={<ViewSchedule />} />
+                  <Route
+                    path="/schedules/massCreate"
+                    element={<MassSchedule />}
+                  />
 
                   <Route path="*" element={<NotFound />} />
                 </Routes>

@@ -122,7 +122,7 @@ const AllSchedules = () => {
                       {scheduleByDay[day.formatted].map(schedule => (
                         <ListItem key={schedule.id}>
                           <ListItemText primary={format(new Date(schedule.datetime), "HH:mm")} />
-                          <ListItemText primary={cleaningChecklists.find(c => c.id === schedule.cleaning_checklist)?.title || ""} />
+                          <ListItemText primary={cleaningChecklists.find(c => c.id === schedule.cleaning_checklist)?.title || ""} onClick={() => navigate(schedule.id.toString())}/>
                           <ListItemText primary={schedule.cleaners.map(cleaner => cleaners.find(c => c.id === cleaner)?.name || "").join(", ")} />
                         </ListItem>
                       ))}

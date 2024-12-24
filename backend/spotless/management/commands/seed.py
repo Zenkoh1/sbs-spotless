@@ -163,6 +163,13 @@ def create_data():
         CleaningChecklistStep(cleaning_schedule=cleaning_schedules[2], cleaning_checklist_item=cleaning_checklist_items[3], status=CleaningChecklistStep.StatusType.INCOMPLETE),
         CleaningChecklistStep(cleaning_schedule=cleaning_schedules[2], cleaning_checklist_item=cleaning_checklist_items[4], status=CleaningChecklistStep.StatusType.INCOMPLETE),
         CleaningChecklistStep(cleaning_schedule=cleaning_schedules[2], cleaning_checklist_item=cleaning_checklist_items[5], status=CleaningChecklistStep.StatusType.INCOMPLETE),
+
+        CleaningChecklistStep(cleaning_schedule=cleaning_schedules[6], cleaning_checklist_item=cleaning_checklist_items[0], status=CleaningChecklistStep.StatusType.INCOMPLETE),
+        CleaningChecklistStep(cleaning_schedule=cleaning_schedules[6], cleaning_checklist_item=cleaning_checklist_items[1], status=CleaningChecklistStep.StatusType.INCOMPLETE),
+        CleaningChecklistStep(cleaning_schedule=cleaning_schedules[6], cleaning_checklist_item=cleaning_checklist_items[2], status=CleaningChecklistStep.StatusType.INCOMPLETE),
+        CleaningChecklistStep(cleaning_schedule=cleaning_schedules[6], cleaning_checklist_item=cleaning_checklist_items[3], status=CleaningChecklistStep.StatusType.INCOMPLETE),
+        CleaningChecklistStep(cleaning_schedule=cleaning_schedules[6], cleaning_checklist_item=cleaning_checklist_items[4], status=CleaningChecklistStep.StatusType.INCOMPLETE),
+        CleaningChecklistStep(cleaning_schedule=cleaning_schedules[6], cleaning_checklist_item=cleaning_checklist_items[5], status=CleaningChecklistStep.StatusType.INCOMPLETE),
     ]
 
     for cleaning_checklist_step in cleaning_checklist_steps:
