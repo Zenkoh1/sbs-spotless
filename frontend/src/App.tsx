@@ -22,10 +22,10 @@ import AllBusModels from "./pages/bus models/AllBusModels";
 import AllBuses from "./pages/bus models/AllBuses";
 import AllChecklists from "./pages/checklist/AllChecklists";
 import ViewChecklist from "./pages/checklist/ViewChecklist";
+import AllCleaners from "./pages/cleaners/AllCleaners";
 import AllSchedules from "./pages/schedules/AllSchedules";
 import MassSchedule from "./pages/schedules/MassSchedule";
 import NotFound from "./pages/misc/NotFound";
-
 
 type AuthContextType = {
   isAuth: boolean;
@@ -89,6 +89,17 @@ function App() {
                   <Route path="/" element={<HomePage />} />
                   <Route path="/login" element={<Login />} />
 
+                <Route path="/busModels" element={<AllBusModels />} />
+                <Route path="/buses" element={<AllBuses />} />
+                <Route path="/checklists" element={<AllChecklists />} />
+                <Route path="/checklists/:id" element={<ViewChecklist />} />
+                <Route path="/cleaners" element={<AllCleaners />} />
+              </Routes>
+            </Layout>
+          </BrowserRouter>
+        </div>
+      </AuthContext.Provider>
+    </ThemeProvider>
                   <Route path="/busModels" element={<AllBusModels />} />
                   <Route path="/buses" element={<AllBuses />} />
                   <Route path="/checklists" element={<AllChecklists />} />
