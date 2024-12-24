@@ -35,6 +35,16 @@ class CleaningScheduleViewSet(viewsets.ModelViewSet):
             schedule['bus'] = bus_serializer.data
         return Response(serializer.data)
     
+    def retrieve(self, request, pk=None):
+        queryset = CleaningSchedule.objects.filter(cleaners=request.user)
+        schedule = queryset.get(id=pk)
+        serializer = CleaningScheduleSerializer(schedule)
+        bus = Bus.objects.get(id=serializer.data['bus'])
+        bus_serializer = BusSerializer(bus)
+        schedule_data = serializer.data
+        schedule_data['bus'] = bus_serializer.data
+        return Response(schedule_data)
+    
 
 '''
 Can only get or update (ie. change the status) the cleaning checklist steps
@@ -45,7 +55,7 @@ class CleaningChecklistStepViewSet(viewsets.ModelViewSet):
     queryset = CleaningChecklistStep.objects.all()
     serializer_class = CleaningChecklistStepSerializer
     permission_classes = [IsAuthenticated]
-    http_method_names = ['get', 'patch']
+    http_method_names = ['get', 'patch', 'delete']
 
     def list(self, request, *args, **kwargs):
         cleaning_schedule_id = self.kwargs.get('cleaning_schedule_id')
@@ -57,12 +67,11 @@ class CleaningChecklistStepViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
     
     @action(detail=True, methods=['patch'])
-    def upload_images(self, request, pk=None):
+    def upload_image(self, request, pk=None):
         # Retrieve the instance
         step = self.get_object()
         # Extract single image from the request
-        image = request.FILES.getlist('images')
-        assert image.count() == 1
+        image = request.FILES.get('image')
         # Add new image to the step
         pil_image = PIL.Image.open(image)
         response = model.generate_content([
