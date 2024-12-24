@@ -1,4 +1,4 @@
-type UserType = {
+type User = {
   id: number;
   name: string;
   email: string;
@@ -8,4 +8,4 @@ type UserType = {
   // updated_at: string;
 };
 
-export default UserType;
+export default User;

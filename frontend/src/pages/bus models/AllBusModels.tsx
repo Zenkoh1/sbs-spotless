@@ -168,7 +168,9 @@ const BusModelForm = ({
 
   return (
     <>
-      {formState.image && <img src={getImagePreview(formState.image)} alt="bus model" width="100%" />}
+      {formState.image && (
+        <img src={getImagePreview(formState.image)} alt="bus model" width="100%" />
+      )}
       {!formState.image && (
         <Button variant="contained" component="label">
           Upload image

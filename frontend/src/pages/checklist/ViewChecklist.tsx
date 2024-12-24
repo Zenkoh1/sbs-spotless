@@ -82,16 +82,21 @@ const ViewChecklist = () => {
 
   return (
     <Container>
-      <Stack direction="row" spacing={2} mb={2}>
-        <Box>
-          <Typography variant="h4">{checklist.title}</Typography>
-          <Typography variant="body1">{checklist.description}</Typography>
-        </Box>
-        <Button variant="contained" color="secondary" onClick={handleDeleteChecklist}>Delete</Button>
-      </Stack>
-      <ChecklistTable checklistSteps={checklistSteps} handleIncreaseOrder={handleIncreaseOrder} handleDecreaseOrder={handleDecreaseOrder} handleDeleteItem={handleDeleteItem}/>
-      <Fab color="primary" aria-label="add" sx={{ position: 'fixed', bottom: 16, right: 16 }} onClick={() => setCreateModalIsOpen(true)}>
+      <Box>
+        <Typography variant="h4">{checklist.title}</Typography>
+        <Typography variant="body1">{checklist.description}</Typography>
+      </Box>
+      <ChecklistTable 
+        checklistSteps={checklistSteps} 
+        handleIncreaseOrder={handleIncreaseOrder} 
+        handleDecreaseOrder={handleDecreaseOrder} 
+        handleDeleteItem={handleDeleteItem}
+      />
+      <Fab color="primary" aria-label="add" sx={{ position: 'fixed', bottom: 16, right: 80 }} onClick={() => setCreateModalIsOpen(true)}>
         <Add />
+      </Fab>
+      <Fab color="primary" aria-label="delete" sx={{ position: 'fixed', bottom: 16, right: 16 }} onClick={handleDeleteChecklist}>
+        <Delete />
       </Fab>
       <ChecklistItemForm
         initialValues={{ id: 0, order: checklistSteps.length > 0 ? Math.max(...checklistSteps.map(step => step.order)) + 1 : 1, title: "", description: "", is_image_required: false, image: "", cleaning_checklist: parseInt(id || "0") }}
@@ -114,13 +119,14 @@ const ViewChecklist = () => {
 
 const ChecklistTable = ({ checklistSteps, handleIncreaseOrder, handleDecreaseOrder, handleDeleteItem } : { checklistSteps: ChecklistItem[], handleIncreaseOrder: (id: number) => void, handleDecreaseOrder: (id: number) => void, handleDeleteItem: (id: number) => void }) => {
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={Paper} sx={{mt: 4}}>
       <MUITable>
         <TableHead>
           <TableRow>
             <TableCell sx={{width:"5%"}}>Order</TableCell>
             <TableCell>Title</TableCell>
             <TableCell>Content</TableCell>
+            <TableCell>Image required?</TableCell>
             <TableCell sx={{width:"20%"}}>Action</TableCell>
           </TableRow>
         </TableHead>
@@ -132,6 +138,9 @@ const ChecklistTable = ({ checklistSteps, handleIncreaseOrder, handleDecreaseOrd
               <TableCell>
                 <Typography variant="body2">{step.description}</Typography>
                 <img src={getImagePreview(step.image)} alt={step.title} style={{ width: 100, height: 100 }} />
+              </TableCell>
+              <TableCell>
+                <Checkbox checked={step.is_image_required} />
               </TableCell>
               <TableCell sx={{width:"20%"}}>
                 <IconButton onClick={() => handleDecreaseOrder(step.id)}>

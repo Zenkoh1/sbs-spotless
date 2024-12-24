@@ -1,9 +1,9 @@
 import { Button, Box } from "@mui/material";
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import FormTextField from "../components/FormTextField";
-import { loginUser } from "../api/sessionManager";
-import { AuthContext } from "../App";
+import FormTextField from "../../components/FormTextField";
+import { loginUser } from "../../api/sessionManager";
+import { AuthContext } from "../../App";
 
 const Loginpage = () => {
   const [email, setEmail] = useState("");
