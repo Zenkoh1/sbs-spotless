@@ -2,6 +2,9 @@ from django.core.management.base import BaseCommand
 from spotless.models import CleaningChecklistItem, CleaningSchedule, CleaningChecklistStep, CleaningChecklistStepImages, CleaningChecklist
 from spotless.models import Bus, BusModel
 from spotless.models import User
+
+from spotless_survey.models import CleanlinessSurvey, CleanlinessSurveyImage
+
 from datetime import datetime
 from datetime import timedelta
 import logging
@@ -138,30 +141,47 @@ def create_data():
 
     """Create Cleaning Checklist Steps"""
     logger.info("Creating Cleaning Checklist Steps")
+
     cleaning_checklist_steps = [
         CleaningChecklistStep(cleaning_schedule=cleaning_schedules[0], cleaning_checklist_item=cleaning_checklist_items[0], status=CleaningChecklistStep.StatusType.INCOMPLETE),
-        CleaningChecklistStep(cleaning_schedule=cleaning_schedules[0], cleaning_checklist_item=cleaning_checklist_items[1], status=CleaningChecklistStep.StatusType.IN_PROGRESS),
+        CleaningChecklistStep(cleaning_schedule=cleaning_schedules[0], cleaning_checklist_item=cleaning_checklist_items[1], status=CleaningChecklistStep.StatusType.INCOMPLETE),
         CleaningChecklistStep(cleaning_schedule=cleaning_schedules[0], cleaning_checklist_item=cleaning_checklist_items[2], status=CleaningChecklistStep.StatusType.INCOMPLETE),
-        CleaningChecklistStep(cleaning_schedule=cleaning_schedules[0], cleaning_checklist_item=cleaning_checklist_items[3], status=CleaningChecklistStep.StatusType.IN_PROGRESS),
+        CleaningChecklistStep(cleaning_schedule=cleaning_schedules[0], cleaning_checklist_item=cleaning_checklist_items[3], status=CleaningChecklistStep.StatusType.INCOMPLETE),
         CleaningChecklistStep(cleaning_schedule=cleaning_schedules[0], cleaning_checklist_item=cleaning_checklist_items[4], status=CleaningChecklistStep.StatusType.INCOMPLETE),
-        CleaningChecklistStep(cleaning_schedule=cleaning_schedules[0], cleaning_checklist_item=cleaning_checklist_items[5], status=CleaningChecklistStep.StatusType.IN_PROGRESS),
+        CleaningChecklistStep(cleaning_schedule=cleaning_schedules[0], cleaning_checklist_item=cleaning_checklist_items[5], status=CleaningChecklistStep.StatusType.INCOMPLETE),
 
-        CleaningChecklistStep(cleaning_schedule=cleaning_schedules[1], cleaning_checklist_item=cleaning_checklist_items[0], status=CleaningChecklistStep.StatusType.IN_PROGRESS),
+        CleaningChecklistStep(cleaning_schedule=cleaning_schedules[1], cleaning_checklist_item=cleaning_checklist_items[0], status=CleaningChecklistStep.StatusType.INCOMPLETE),
         CleaningChecklistStep(cleaning_schedule=cleaning_schedules[1], cleaning_checklist_item=cleaning_checklist_items[1], status=CleaningChecklistStep.StatusType.INCOMPLETE),
-        CleaningChecklistStep(cleaning_schedule=cleaning_schedules[1], cleaning_checklist_item=cleaning_checklist_items[2], status=CleaningChecklistStep.StatusType.IN_PROGRESS),
+        CleaningChecklistStep(cleaning_schedule=cleaning_schedules[1], cleaning_checklist_item=cleaning_checklist_items[2], status=CleaningChecklistStep.StatusType.INCOMPLETE),
         CleaningChecklistStep(cleaning_schedule=cleaning_schedules[1], cleaning_checklist_item=cleaning_checklist_items[3], status=CleaningChecklistStep.StatusType.INCOMPLETE),
-        CleaningChecklistStep(cleaning_schedule=cleaning_schedules[1], cleaning_checklist_item=cleaning_checklist_items[4], status=CleaningChecklistStep.StatusType.IN_PROGRESS),
+        CleaningChecklistStep(cleaning_schedule=cleaning_schedules[1], cleaning_checklist_item=cleaning_checklist_items[4], status=CleaningChecklistStep.StatusType.INCOMPLETE),
         CleaningChecklistStep(cleaning_schedule=cleaning_schedules[1], cleaning_checklist_item=cleaning_checklist_items[5], status=CleaningChecklistStep.StatusType.INCOMPLETE),
 
         CleaningChecklistStep(cleaning_schedule=cleaning_schedules[2], cleaning_checklist_item=cleaning_checklist_items[0], status=CleaningChecklistStep.StatusType.INCOMPLETE),
-        CleaningChecklistStep(cleaning_schedule=cleaning_schedules[2], cleaning_checklist_item=cleaning_checklist_items[1], status=CleaningChecklistStep.StatusType.IN_PROGRESS),
+        CleaningChecklistStep(cleaning_schedule=cleaning_schedules[2], cleaning_checklist_item=cleaning_checklist_items[1], status=CleaningChecklistStep.StatusType.INCOMPLETE),
         CleaningChecklistStep(cleaning_schedule=cleaning_schedules[2], cleaning_checklist_item=cleaning_checklist_items[2], status=CleaningChecklistStep.StatusType.INCOMPLETE),
-        CleaningChecklistStep(cleaning_schedule=cleaning_schedules[2], cleaning_checklist_item=cleaning_checklist_items[3], status=CleaningChecklistStep.StatusType.IN_PROGRESS),
+        CleaningChecklistStep(cleaning_schedule=cleaning_schedules[2], cleaning_checklist_item=cleaning_checklist_items[3], status=CleaningChecklistStep.StatusType.INCOMPLETE),
         CleaningChecklistStep(cleaning_schedule=cleaning_schedules[2], cleaning_checklist_item=cleaning_checklist_items[4], status=CleaningChecklistStep.StatusType.INCOMPLETE),
-        CleaningChecklistStep(cleaning_schedule=cleaning_schedules[2], cleaning_checklist_item=cleaning_checklist_items[5], status=CleaningChecklistStep.StatusType.IN_PROGRESS),
+        CleaningChecklistStep(cleaning_schedule=cleaning_schedules[2], cleaning_checklist_item=cleaning_checklist_items[5], status=CleaningChecklistStep.StatusType.INCOMPLETE),
     ]
+
     for cleaning_checklist_step in cleaning_checklist_steps:
         cleaning_checklist_step.save()
+
+    """Create Cleanliness Survey"""
+    logger.info("Creating Cleanliness Survey")
+    cleanliness_surveys = [
+        CleanlinessSurvey(bus=buses[0], rating=4, comment="The seats are not clean", is_resolved=False),
+        CleanlinessSurvey(bus=buses[0], rating=4, comment="The ceiling is not clean", is_resolved=False),
+        CleanlinessSurvey(bus=buses[1], rating=3, comment="The floor is not clean", is_resolved=False),
+        CleanlinessSurvey(bus=buses[2], rating=5, comment="The windows are not clean", is_resolved=False),
+        CleanlinessSurvey(bus=buses[3], rating=2, comment="There is a an awful stench", is_resolved=False),
+        CleanlinessSurvey(bus=buses[4], rating=1, comment="There are trash lying around", is_resolved=False),
+        CleanlinessSurvey(bus=buses[5], rating=4, comment="The seats have stains", is_resolved=False),
+    ]
+
+    for cleanliness_survey in cleanliness_surveys:
+        cleanliness_survey.save()
 
 def run_seed(self, mode):
     """ Seed database based on mode
