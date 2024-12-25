@@ -33,7 +33,7 @@ const AllCleaners = () => {
   
     registerCleaner(cleanerWithPassword)
       .then((result) => {
-        const updatedCleaners = [...cleaners, result];
+        const updatedCleaners = [...cleaners, result as UserType];
         setCleaners(updatedCleaners);
         setCreateModalOpen(false);
       })

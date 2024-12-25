@@ -2,7 +2,7 @@ import axios from "axios";
 import { BACKEND_URL } from "../constants";
 
 export function registerCleaner({ name, email, password }: { name: string, email: string, password: string }): Promise<any> {
-    return axios.post(`${BACKEND_URL}register`, { name, email, password });
+    return axios.post(`${BACKEND_URL}register`, { name, email, password }).then(response => response.data);
 }
 
 export function getCleaners(): Promise<any[]> {
