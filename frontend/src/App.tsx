@@ -19,6 +19,7 @@ import AllSchedules from "./pages/schedules/AllSchedules";
 import MassSchedule from "./pages/schedules/MassSchedule";
 import NotFound from "./pages/misc/NotFound";
 import ViewSchedule from "./pages/schedules/ViewSchedule";
+import AllSurveys from "./pages/survey/AllSurveys";
 
 type AuthContextType = {
   isAuth: boolean;
@@ -97,6 +98,8 @@ function App() {
                     path="/schedules/massCreate"
                     element={<MassSchedule />}
                   />
+
+                  <Route path="/survey" element={<AllSurveys />} />
 
                   <Route path="*" element={<NotFound />} />
                 </Routes>

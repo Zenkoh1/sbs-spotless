@@ -18,14 +18,10 @@ const AllChecklists = () => {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const navigate = useNavigate();
 
-  const fetchChecklists = () => {
+  useEffect(() => {
     retrieveAllChecklists()
       .then(result => setChecklists(result))
       .catch(error => console.error(error));
-  };
-
-  useEffect(() => {
-    fetchChecklists();
   }, []);
 
   const handleSave = (checklist: Checklist) => {
