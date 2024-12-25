@@ -3,7 +3,7 @@ import { logoutUser } from "../api/sessionManager";
 import { useContext } from "react";
 import { AuthContext } from "../App";
 import { NavLink, useLocation } from "react-router-dom";
-import { BusAlert, Checklist, Home, Settings, CleaningServices } from "@mui/icons-material";
+import { BusAlert, Checklist, Home, Settings, CleaningServices, QuestionMark } from "@mui/icons-material";
 
 const NAV_ITEMS = [
   { label: "Home", icon: <Home />, path: "/" },
@@ -12,6 +12,7 @@ const NAV_ITEMS = [
   { label: "Checklists", icon: <Checklist />, path: "/checklists" },
   { label: "Cleaners", icon: <CleaningServices />, path: "/cleaners" },
   { label: "Schedules", icon: <Checklist />, path: "/schedules" },
+  { label: "Survey Results", icon: <QuestionMark />, path: "/survey" },
   { label: "Settings", icon: <Settings />, path: "/settings" },
 ]
 
