@@ -114,26 +114,119 @@ const ModalContent = (props: {
         </Tabs>
       </Box>
       <CustomTabPanel value={value} index={0}>
-        CCTV
+        <Box sx={{ height: "calc(80vh - 120px)", overflow: "auto" }}>
+          <Box
+            sx={{
+              display: "grid",
+              gridTemplateColumns: "repeat(2, 1fr)", // 4 columns for a 2x4 layout
+              gap: 2, // Spacing between items
+              padding: 2,
+            }}
+          >
+            {[...Array(8)].map((_, index) => (
+              <Box
+                key={index}
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  border: "1px solid #ccc",
+                  borderRadius: 2,
+                  padding: 1,
+                }}
+              >
+                <Box
+                  sx={{
+                    width: "100%",
+                    height: 100,
+                    backgroundColor: "#e0e0e0",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Typography variant="caption">CCTV {index + 1}</Typography>
+                </Box>
+              </Box>
+            ))}
+          </Box>
+          <Box sx={{ marginTop: 3, paddingX: 2 }}>
+            <Typography variant="h6" gutterBottom>
+              Issues Found:
+            </Typography>
+            <ul>
+              {[
+                "BC Seat not clean",
+                "Stains on the floor",
+                "Trash in the aisle",
+              ].map((issue, idx) => (
+                <li key={idx}>
+                  <Typography variant="body1">{issue}</Typography>
+                </li>
+              ))}
+            </ul>
+          </Box>
+        </Box>
       </CustomTabPanel>
       <CustomTabPanel value={value} index={1}>
         <Box
           sx={{
-            height: "calc(80vh - 120px)", // Adjust height based on the modal and tabs
-            overflow: "auto", // Enable scrolling
+            height: "calc(80vh - 120px)",
+            overflow: "auto",
+            padding: 2,
+            display: "flex",
+            flexDirection: "column",
+            gap: 2,
           }}
         >
           {surveys.map((survey) => (
-            <div key={survey.id} style={{ marginBottom: 10 }}>
-              <Typography variant="h6">Rating: {survey.rating}</Typography>
+            <Box
+              key={survey.id}
+              sx={{
+                border: "1px solid #ccc",
+                borderRadius: 2,
+                boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.1)",
+                padding: 2,
+                display: "flex",
+                flexDirection: "column",
+                gap: 1.5,
+              }}
+            >
+              <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                Rating: {survey.rating}
+              </Typography>
               <Typography variant="body1">Comment: {survey.comment}</Typography>
-              {survey.images.map((image) => (
-                <img src={image.image} alt="survey" style={{ width: 100 }} />
-              ))}
-              {survey.images.length == 0 && (
-                <Typography variant="body1">No images provided</Typography>
-              )}
-            </div>
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 1,
+                  flexWrap: "wrap",
+                }}
+              >
+                {survey.images.length > 0 ? (
+                  survey.images.map((image, idx) => (
+                    <Box
+                      key={idx}
+                      component="img"
+                      src={image.image}
+                      alt="survey"
+                      sx={{
+                        width: 100,
+                        height: 100,
+                        objectFit: "cover",
+                        borderRadius: 1,
+                        border: "1px solid #ddd",
+                      }}
+                    />
+                  ))
+                ) : (
+                  <Typography variant="body2" sx={{ color: "gray" }}>
+                    No images provided
+                  </Typography>
+                )}
+              </Box>
+            </Box>
           ))}
         </Box>
       </CustomTabPanel>
