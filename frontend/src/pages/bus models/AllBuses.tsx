@@ -6,12 +6,13 @@ import Bus from "../../types/Bus.type";
 import Table from "../../components/Table";
 import BusModel from "../../types/BusModel.type";
 import { retrieveAllBusModels } from "../../api/busModels";
+import { format } from "date-fns";
 
 const COLUMNS: { key: any; label: string; sortable?: boolean }[] = [
   { key: "id", label: "ID", sortable: false },
   { key: "number_plate", label: "License Plate", sortable: true },
   { key: "bus_model", label: "Bus Model", sortable: true },
-  { key: "created_at", label: "Created At", sortable: true },
+  { key: "rating", label: "Rating", sortable: true },
 ];
 
 type ModalState = 
@@ -74,11 +75,15 @@ const AllBuses = () => {
         data={buses.map((bus) => {
           return {
             ...bus,
-            bus_model: busModels.find(busModel => busModel.id === bus.bus_model)?.name
+            bus_model: busModels.find(busModel => busModel.id === bus.bus_model)?.name,
+            rating: Math.random() * 5 // TODO: Stand in until we have the rating api up
           }
         })}
         onRowClick={(row) => setModalState({ type: "view", bus: buses.find(b => b.id === row.id) || null })}
       />
+      <Typography variant="body2" mt={2}>
+        Last updated: {buses.length > 0 ? format(buses.map(b => b.updated_at).sort().reverse()[0] || new Date(), "yyyy-MM-dd HH:mm").toString() : "never"}
+      </Typography>
       <BusModal
         modalState={modalState}
         setModalState={setModalState}
@@ -126,7 +131,7 @@ const BusModal = ({
     if (!bus) return null;
     return (
       <Dialog onClose={onClose} open>
-        <DialogTitle>Viewing details of bus {bus.number_plate}</DialogTitle>
+        <DialogTitle>Viewing Bus {bus.number_plate}</DialogTitle>
         <DialogContent>
           <Typography variant="body1">
             <strong>ID:</strong> {bus.id}

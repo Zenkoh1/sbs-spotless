@@ -5,6 +5,7 @@ import { editBusModel, retrieveAllBusModels, createBusModel, deleteBusModel } fr
 import { Box, Button, Dialog, DialogContent, DialogTitle, Fab, Stack, TextField, Typography } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import { getImagePreview } from "../../util/imageHelper";
+import { format } from "date-fns";
 
 const COLUMNS: { key: keyof BusModel; label: string; sortable?: boolean }[] = [
   { key: "id", label: "ID", sortable: false },
@@ -69,6 +70,9 @@ const AllBusModels = () => {
         columns={COLUMNS}
         onRowClick={(row) => setModalState({ type: "view", busModel: row })}
       />
+      <Typography variant="body2" mt={2}>
+        Last updated: {busModels.length > 0 ? format(busModels.map(model => model.updated_at).sort().reverse()[0] || new Date(), "yyyy-MM-dd HH:mm").toString() : "never"}
+      </Typography>
       <BusModelModal
         modalState={modalState}
         onClose={() => setModalState(null)}
@@ -113,9 +117,9 @@ const BusModelModal = ({
     if (!busModel) return null;
     return (
       <Dialog onClose={onClose} open>
-        <DialogTitle>{busModel.name}</DialogTitle>
+        <DialogTitle textAlign="center">Viewing Bus Model {busModel.name}</DialogTitle>
         <DialogContent>
-          <img src={getImagePreview(busModel.image)} alt={busModel.name} style={{ width: "100%" }} />
+          <img src={getImagePreview(busModel.image)} alt={busModel.name} style={{ width: "80%", marginLeft: "10%", marginBottom: "16px"}} />
           <Typography variant="body1">
             <strong>ID:</strong> {busModel.id}
           </Typography>
@@ -140,7 +144,7 @@ const BusModelModal = ({
 
   return (
     <Dialog onClose={onClose} open>
-      <DialogTitle>{type === "edit" ? "Edit Bus Model" : "Create Bus Model"}</DialogTitle>
+      <DialogTitle textAlign="center">{type === "edit" ? "Edit Bus Model" : "Create Bus Model"}</DialogTitle>
       <DialogContent>
         <BusModelForm
           initialValues={busModel || { id: 0, name: "", description: "", image: null }}
@@ -169,10 +173,10 @@ const BusModelForm = ({
   return (
     <>
       {formState.image && (
-        <img src={getImagePreview(formState.image)} alt="bus model" width="100%" />
+        <img src={getImagePreview(formState.image)} alt="bus model" style={{ width: "80%", marginLeft: "10%", marginBottom: "16px"}}/>
       )}
       {!formState.image && (
-        <Button variant="contained" component="label">
+        <Button variant="outlined" component="label" fullWidth>
           Upload image
           <input
             type="file"

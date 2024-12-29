@@ -1,5 +1,5 @@
 import { Search, Sort } from "@mui/icons-material";
-import { Container, Box, TextField, TableContainer, Paper, TableBody, TableCell, TableHead, TableRow, Table as MUITable, Icon, InputAdornment, Stack, Typography } from "@mui/material";
+import { Container, Box, TextField, TableContainer, Paper, TableBody, TableCell, TableHead, TableRow, Table as MUITable, Icon, InputAdornment, Stack, Typography, Rating } from "@mui/material";
 import { useState, useMemo } from "react";
 import { format } from "date-fns";
 
@@ -37,10 +37,20 @@ const Table = <T extends object> ({ data, columns, onRowClick }: TableProps<T>) 
     })
   };
 
+  const getElement = (row: T, column: { key: keyof T; label: string }) => {
+    if (column.key === "created_at" || column.key === "updated_at") {
+      return format(new Date(row[column.key] as string), "yyyy-MM-dd");
+    } else if (column.key === "rating") {
+      return <Rating value={row[column.key] as number} readOnly />;
+    }
+    const value = row[column.key];
+    return typeof value === "string" || typeof value === "number" ? value : String(value);
+  }
+
   if (data.length === 0) {
     return (
       <Container>
-        <Typography variant="h6">No data available</Typography>
+        <Typography variant="body1" mt={4}>No data available</Typography>
       </Container>
     )
   }
@@ -49,7 +59,7 @@ const Table = <T extends object> ({ data, columns, onRowClick }: TableProps<T>) 
     <Container>
       <Box mb={2}>
         <TextField
-        fullWidth
+          fullWidth
           variant="outlined"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
@@ -64,14 +74,27 @@ const Table = <T extends object> ({ data, columns, onRowClick }: TableProps<T>) 
                 </InputAdornment>
             }
           }}
+          sx={{
+          "& .MuiOutlinedInput-root": {
+            borderRadius: "32px",
+          },
+      }}
         />
       </Box>
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} sx={{ maxHeight: 600, overflowY: 'auto' }}>
         <MUITable>
           <TableHead>
             <TableRow>
               {columns.map((column) => (
-                <TableCell key={String(column.key)}>
+                <TableCell 
+                  key={String(column.key)}
+                  sx={{
+                    maxWidth: "150px",
+                    wordWrap: "break-word",
+                    overflow: "hidden",
+                    whiteSpace: "normal",
+                  }}
+                >
                   <Stack direction="row" gap={4}>
                     {column.label}
                     {column.sortable && 
@@ -88,13 +111,17 @@ const Table = <T extends object> ({ data, columns, onRowClick }: TableProps<T>) 
             {sortedData.map((row, index) => (
               <TableRow key={index} onClick={() => onRowClick && onRowClick(row)}>
                 {columns.map((column) => (
-                  <TableCell key={String(column.key)}>
+                  <TableCell 
+                    key={String(column.key)}
+                    sx={{
+                      maxWidth: "150px",
+                      wordWrap: "break-word",
+                      overflow: "hidden",
+                      whiteSpace: "normal",
+                    }}
+                  >
                     {/* FIXME: Workaround until i can get a way to test if typeof(data[0][column.key]) === Date*/}
-                    {
-                      column.key === "created_at" ?
-                        format(row[column.key] as Date, "yyyy-MM-dd") :
-                        String(row[column.key])
-                    }
+                    {getElement(row, column)}
                   </TableCell>
                 ))}
               </TableRow>

@@ -1,19 +1,18 @@
-import { AppBar, Toolbar, Typography, Button, List, ListItem, ListItemText, ListItemIcon, Box } from "@mui/material";
-import { logoutUser } from "../api/sessionManager";
+import { AppBar, Toolbar, Typography, Box, IconButton, Avatar, Stack } from "@mui/material";
+import { getName, logoutUser } from "../api/sessionManager";
 import { useContext } from "react";
 import { AuthContext } from "../App";
 import { NavLink, useLocation } from "react-router-dom";
-import { BusAlert, Checklist, Home, Settings, CleaningServices, QuestionMark } from "@mui/icons-material";
+import { Checklist, CleaningServices, QuestionMark, DirectionsBus, Commute, Schedule, Logout, Home } from "@mui/icons-material";
 
 const NAV_ITEMS = [
   { label: "Home", icon: <Home />, path: "/" },
-  { label: "Bus Models", icon: <BusAlert />, path: "/busModels" },
-  { label: "Buses", icon: <BusAlert />, path: "/buses" },
+  { label: "Models", icon: <Commute />, path: "/busModels" },
+  { label: "Buses", icon: <DirectionsBus />, path: "/buses" },
   { label: "Checklists", icon: <Checklist />, path: "/checklists" },
   { label: "Cleaners", icon: <CleaningServices />, path: "/cleaners" },
-  { label: "Schedules", icon: <Checklist />, path: "/schedules" },
-  { label: "Survey Results", icon: <QuestionMark />, path: "/survey" },
-  { label: "Settings", icon: <Settings />, path: "/settings" },
+  { label: "Schedules", icon: <Schedule />, path: "/schedules" },
+  { label: "Survey", icon: <QuestionMark />, path: "/survey" },
 ]
 
 const Navbar = () => {
@@ -24,6 +23,8 @@ const Navbar = () => {
         width: 200,
         height: "100vh",
         left: 0,
+        bgcolor: "#5d107c",
+        color: "white",
       }}
     >
       <Toolbar
@@ -34,27 +35,39 @@ const Navbar = () => {
           padding: "8px",
         }}
       >
-        <Typography variant="h5" mb={2} p={1}>
-          Spotless™
+        <Typography variant="h4" mb={4} mt={1}>
+          Spotless
         </Typography>
 
-        <List sx={{ width: "100%" }}>
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 1, width: "100%" }}>
           {NAV_ITEMS.map((item, index) => (
-            <ListItem
+            <NavLink
               key={index}
-              component={NavLink}
               to={item.path}
-              sx={{
+              style={({ isActive }) => ({
                 display: "flex",
-                justifyContent: "center",
-                color: "inherit"
-              }}
+                alignItems: "center",
+                textDecoration: "none",
+                color: isActive ? "white" : "rgba(255, 255, 255, 0.7)",
+                backgroundColor: isActive ? "#9b65af" : "transparent",
+                padding: "8px 8px",
+                borderRadius: "8px",
+              })}
             >
-              <ListItemIcon sx={{ minWidth: 40, color: "inherit" }}>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.label} />
-            </ListItem>
+              <IconButton
+                sx={{
+                  color: "inherit",
+                  minWidth: 40,
+                }}
+              >
+                {item.icon}
+              </IconButton>
+              <Typography variant="body1">
+                {item.label}
+              </Typography>
+            </NavLink>
           ))}
-        </List>
+        </Box>
       </Toolbar>
     </AppBar>
   );
@@ -70,6 +83,9 @@ const Topbar = () => {
       sx={{
         left: 200,
         width: `calc(100% - 200px)`,
+        bgcolor: "white",
+        color: "black",
+        boxShadow: "none",
       }}
     >
       <Toolbar
@@ -79,23 +95,26 @@ const Topbar = () => {
           alignItems: "center",
         }}
       >
-        <Typography variant="h6">
-          {NAV_ITEMS.find(i => i.path === location.pathname)?.label}
+        <Typography variant="h4" ml="8px" sx={{ fontWeight: "bold" }}>
+          { NAV_ITEMS.filter(item => item.path !== "/").find(item => location.pathname.startsWith(item.path))?.label}
         </Typography>
-
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={() => {
-            logoutUser()
-              .then(() => setIsAuth(false))
-              .catch(() => {
-                alert("Error logging out, refresh the page!");
-              });
-          }}
-        >
-          Logout
-        </Button>
+        
+        <Stack direction="row" spacing={2}>
+          <IconButton
+            onClick={() => {
+              logoutUser()
+                .then(() => setIsAuth(false))
+                .catch(() => {
+                  alert("Error logging out, refresh the page!");
+                });
+            }}
+          >
+            <Logout />
+          </IconButton>
+          <Avatar>
+            {getName().charAt(0)}
+          </Avatar>
+        </Stack>
       </Toolbar>
     </AppBar>
   );
@@ -110,7 +129,8 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         sx={{
           marginLeft: "200px",
           marginTop: "64px",
-          padding: "16px"
+          padding: "16px",
+          paddingTop: "64px",
         }}
       >
         {children}
