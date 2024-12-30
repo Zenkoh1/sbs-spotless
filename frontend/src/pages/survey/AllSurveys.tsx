@@ -35,7 +35,7 @@ const AllSurveys = () => {
         data={surveyResults.map((survey) => {
           return {
             ...survey,
-            rating: `${survey.rating}/10`,
+            rating: survey.rating,
             bus: buses.find(b => b.id === survey.bus)?.number_plate
           }
         })}

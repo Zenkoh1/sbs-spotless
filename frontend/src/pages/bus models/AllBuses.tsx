@@ -1,5 +1,5 @@
 import { Autocomplete, Box, Button, Dialog, DialogContent, DialogTitle, Fab, Stack, TextField, Typography } from "@mui/material";
-import { Add } from "@mui/icons-material";
+import { Add, UploadFile } from "@mui/icons-material";
 import { useState, useEffect } from "react";
 import { retrieveAllBuses, editBus, createBus, deleteBus } from "../../api/buses";
 import Bus from "../../types/Bus.type";
@@ -98,11 +98,20 @@ const AllBuses = () => {
         sx={{
           position: "fixed",
           bottom: 16,
-          right: 16,
+          right: 80,
         }}
         onClick={() => {setModalState({ type: "create", bus: null })}}
       >
         <Add /> 
+      </Fab>
+      <Fab color="primary" aria-label="upload" sx={{ position: 'fixed', bottom: 16, right: 16 }} component="label">
+        <UploadFile />
+        <input
+          type="file"
+          hidden
+          accept="image/*"
+          onChange={(e) => console.log("Attempt to upload csv file")}
+        />
       </Fab>
     </Box>
   );
