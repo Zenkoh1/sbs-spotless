@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  Box,
   Button,
   Container,
   FormControl,
@@ -15,7 +14,6 @@ import {
   Typography,
   SelectChangeEvent,
   Autocomplete,
-  Grid,
 } from "@mui/material";
 import { DatePicker, TimePicker } from "@mui/x-date-pickers";
 import { ScheduleMass, DayOfWeek, createMassSchedule } from "../../api/schedules";

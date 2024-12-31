@@ -95,9 +95,15 @@ const Topbar = () => {
           alignItems: "center",
         }}
       >
-        <Typography variant="h4" ml="8px" sx={{ fontWeight: "bold" }}>
-          { NAV_ITEMS.filter(item => item.path !== "/").find(item => location.pathname.startsWith(item.path))?.label}
-        </Typography>
+        { location.pathname === "/" ? (
+          <Typography variant="h4" ml="8px" sx={{ fontWeight: "bold" }}>
+            Home
+          </Typography>
+          ) : (
+          <Typography variant="h4" ml="8px" sx={{ fontWeight: "bold" }}>
+            { NAV_ITEMS.filter(item => item.path !== "/").find(item => location.pathname.startsWith(item.path))?.label}
+          </Typography>
+        )}
         
         <Stack direction="row" spacing={2}>
           <IconButton

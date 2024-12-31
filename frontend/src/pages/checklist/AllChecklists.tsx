@@ -1,8 +1,8 @@
 import { Box, Button, Dialog, DialogContent, DialogTitle, Fab, Stack, TextField, Typography } from "@mui/material";
 import { useState, useEffect } from "react";
 import Checklist from "../../types/Checklist.type";
-import { Add, Create } from "@mui/icons-material";
-import { retrieveAllChecklists, editChecklist, createChecklist, deleteChecklist } from "../../api/checklists";
+import { Add } from "@mui/icons-material";
+import { retrieveAllChecklists, createChecklist } from "../../api/checklists";
 import Table from "../../components/Table";
 import { useNavigate } from "react-router-dom";
 import { format } from "date-fns";
