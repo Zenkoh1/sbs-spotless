@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import Schedule from "../../types/Schedule.type";
 import { createSingleSchedule, retrieveAllSchedules, ScheduleSingle } from "../../api/schedules";
-import { Box, Fab, IconButton, List, ListItem, ListItemText, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
+import { Box, Card, Chip, Fab, Icon, IconButton, Stack, Table, TableBody, TableCell, TableHead, TableRow, Typography } from "@mui/material";
 import { format, subDays, addDays } from "date-fns";
 import Bus from "../../types/Bus.type";
 import { retrieveAllBuses } from "../../api/buses";
 import { useNavigate } from "react-router-dom";
 import SingleScheduleForm from "./SingleScheduleForm";
-import { Add, ArrowBack, ArrowForward, List as ListIcon } from "@mui/icons-material";
+import { Add, ArrowBack, ArrowForward, Link, List as ListIcon } from "@mui/icons-material";
 import Checklist from "../../types/Checklist.type";
 import User from "../../types/User.type";
 import { retrieveAllChecklists } from "../../api/checklists";
@@ -89,9 +89,6 @@ const AllSchedules = () => {
 
   return (
     <Box>
-      <Typography variant="h4" mb={2}>
-        Weekly Cleaning Schedule
-      </Typography>
       <Stack direction="row">
         <IconButton onClick={() => setStartDate(subDays(startDate, 7))}>
           <ArrowBack />
@@ -103,9 +100,9 @@ const AllSchedules = () => {
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell>Bus</TableCell>
+            <TableCell sx={{width: "100px"}}>Bus</TableCell>
             {days.map(day => (
-              <TableCell key={day.formatted}>
+              <TableCell key={day.formatted} sx={{ textAlign: "center"}}>
                 {format(day.date, "EEE, MMM d")}
               </TableCell>
             ))}
@@ -114,26 +111,24 @@ const AllSchedules = () => {
         <TableBody>
           {Object.entries(busesWithSchedules).map(([busId, scheduleByDay]) => (
             <TableRow key={busId}>
-              <TableCell>{buses.find(bus => bus.id === parseInt(busId))?.number_plate}</TableCell>
+              <TableCell sx={{width: "100px"}}>{buses.find(bus => bus.id === parseInt(busId))?.number_plate}</TableCell>
               {days.map(day => (
-                <TableCell key={day.formatted}>
-                  {scheduleByDay[day.formatted].length > 0 ? (
-                    <List>
-                      {scheduleByDay[day.formatted].map(schedule => (
-                        <ListItem key={schedule.id}>
-                          <ListItemText primary={format(new Date(schedule.datetime), "HH:mm")} />
-                          <ListItemText primary={cleaningChecklists.find(c => c.id === schedule.cleaning_checklist)?.title || ""} onClick={() => navigate(schedule.id.toString())}/>
-                          <ListItemText primary={schedule.cleaners.map(cleaner => cleaners.find(c => c.id === cleaner)?.name || "").join(", ")} />
-                        </ListItem>
-                      ))}
-                    </List>
-                  ) : (
-                    <IconButton
-                      onClick={() => setSingleScheduleForm({ isOpen: true, bus: buses.filter(b => b.id === parseInt(busId))[0], datetime: day.date })}
-                    >
+                <TableCell key={day.formatted} width="17%">
+                  <Stack spacing={2} alignItems="center">
+                    {scheduleByDay[day.formatted].map(schedule => (
+                      <Card sx={{ bgcolor: "primary.main", padding: "16px", color: "white", width: "80%"}} onClick={() => navigate(`/schedules/${schedule.id}`)}>
+                        <Typography variant="body1">{format(new Date(schedule.datetime), "HH:mm")}, {cleaningChecklists.find(c => c.id === schedule.cleaning_checklist)?.title || ""}</Typography>
+                        <Stack direction="row" spacing={1} mt={1} flexWrap="wrap">
+                          {schedule.cleaners.map(cleaner => (
+                            <Chip label={cleaners.find(c => c.id === cleaner)?.name} variant="outlined" sx={{color: "white"}}/>
+                          ))}
+                        </Stack>
+                      </Card>
+                    ))}
+                    <IconButton onClick={() => setSingleScheduleForm({ isOpen: true, bus: buses.filter(b => b.id === parseInt(busId))[0], datetime: day.date })}>
                       <Add />
                     </IconButton>
-                  )}
+                  </Stack>
                 </TableCell>
               ))}
             </TableRow>

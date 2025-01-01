@@ -117,58 +117,66 @@ const LiveBusStatus = ({ schedules, buses, cleaners } : { schedules : Schedule[]
   return (
     <Container component={Paper} sx={{ padding: "24px" }}>
       <Typography variant="h6" textAlign="start" gutterBottom>Live Bus Status</Typography>
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>
-                No.
-              </TableCell>
-              <TableCell>
-                Bus
-              </TableCell>
-              <TableCell>
-                Cleaners
-              </TableCell>
-              <TableCell>
-                Status
-              </TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {
-              schedules.map((schedule, index) => (
-                <TableRow key={index}>
-                  <TableCell>{index + 1}</TableCell>
-                  <TableCell>{buses.find(b => b.id === schedule.bus)?.number_plate}</TableCell>
+      {
+        schedules.length === 0 ? (
+          <Typography variant="body1">
+            No cleanings scheduled yet
+          </Typography>
+        ) : (
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
                   <TableCell>
-                    <Stack direction="column" spacing={2}>
-                      {schedule.cleaners.map(cleaner => (
-                        <Stack direction="row" alignItems="center" spacing={1}>
-                          <Avatar sx={{ width: "32px", height: "32px"}}>
-                            {cleaners.find(c => c.id === cleaner)?.name.charAt(0)}
-                          </Avatar>
-                          <Typography variant="body1">
-                            {cleaners.find(c => c.id === cleaner)?.name}
-                          </Typography>
-                        </Stack>
-                      ))}
-                    </Stack>
+                    No.
                   </TableCell>
                   <TableCell>
-                    <Stack direction="row" alignItems="center" spacing={1}>
-                      <Box sx={{width: "16px", height: "16px", borderRadius: "16px", backgroundColor: schedule.status === "ASSIGNED" ? "red" : "green" }}/>
-                      <Typography variant="body1">
-                        {schedule.status === "ASSIGNED" ? "Not yet cleaned" : "Cleaned"}
-                      </Typography>
-                    </Stack>
+                    Bus
+                  </TableCell>
+                  <TableCell>
+                    Cleaners
+                  </TableCell>
+                  <TableCell>
+                    Status
                   </TableCell>
                 </TableRow>
-              ))
-            }
-          </TableBody>
-        </Table>
-      </TableContainer>
+              </TableHead>
+              <TableBody>
+                {
+                  schedules.map((schedule, index) => (
+                    <TableRow key={index}>
+                      <TableCell>{index + 1}</TableCell>
+                      <TableCell>{buses.find(b => b.id === schedule.bus)?.number_plate}</TableCell>
+                      <TableCell>
+                        <Stack direction="column" spacing={2}>
+                          {schedule.cleaners.map(cleaner => (
+                            <Stack direction="row" alignItems="center" spacing={1}>
+                              <Avatar sx={{ width: "32px", height: "32px"}}>
+                                {cleaners.find(c => c.id === cleaner)?.name.charAt(0)}
+                              </Avatar>
+                              <Typography variant="body1">
+                                {cleaners.find(c => c.id === cleaner)?.name}
+                              </Typography>
+                            </Stack>
+                          ))}
+                        </Stack>
+                      </TableCell>
+                      <TableCell>
+                        <Stack direction="row" alignItems="center" spacing={1}>
+                          <Box sx={{width: "16px", height: "16px", borderRadius: "16px", backgroundColor: schedule.status === "ASSIGNED" ? "red" : "green" }}/>
+                          <Typography variant="body1">
+                            {schedule.status === "ASSIGNED" ? "Not yet cleaned" : "Cleaned"}
+                          </Typography>
+                        </Stack>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                }
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )
+      }
     </Container>
   )
 }
@@ -177,30 +185,40 @@ const PieChart = ({ schedules } : { schedules : Schedule[] }) => {
   return (
     <Container component={Paper} sx={{ padding: "24px", height: "100%" }}>
       <Typography variant="h6" textAlign="start" gutterBottom>Current Cleaning Status</Typography>
-      <SimplePieChart
-        data={[
-          { color: "red", value: schedules.filter(s => s.status === "ASSIGNED").length },
-          { color: "green", value: schedules.filter(s => s.status === "COMPLETED").length },
-        ]}
-        lineWidth={20}
-        style={{ height: "auto"}}
-      />
-      <Stack spacing={1} mt={2}>
-        <Stack direction="row" alignContent="space-between" width="100%">
-          <Stack direction="row" spacing={1} alignItems="center">
-            <Box sx={{width: "16px", height: "16px", borderRadius: "16px", backgroundColor: "red" }}/>
-            <Typography variant="body1">Not yet cleaned</Typography>
-          </Stack>
-          <Typography variant="body1" ml="auto">{schedules.filter(s => s.status === "ASSIGNED").length / schedules.length * 100}%</Typography>
-        </Stack>
-        <Stack direction="row" alignContent="space-between" width="100%">
-          <Stack direction="row" spacing={1} alignItems="center">
-            <Box sx={{width: "16px", height: "16px", borderRadius: "16px", backgroundColor: "green" }}/>
-            <Typography variant="body1">Cleaned</Typography>
-          </Stack>
-          <Typography variant="body1" ml="auto">{schedules.filter(s => s.status === "COMPLETED").length / schedules.length * 100}%</Typography>
-        </Stack>
-      </Stack>
+      {
+        schedules.length === 0 ? (
+          <Typography variant="body1">
+            No cleanings scheduled yet
+          </Typography>
+        ) : (
+          <>
+            <SimplePieChart
+              data={[
+                { color: "red", value: schedules.filter(s => s.status === "ASSIGNED").length },
+                { color: "green", value: schedules.filter(s => s.status === "COMPLETED").length },
+              ]}
+              lineWidth={20}
+              style={{ height: "auto"}}
+            />
+            <Stack spacing={1} mt={2}>
+              <Stack direction="row" alignContent="space-between" width="100%">
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <Box sx={{width: "16px", height: "16px", borderRadius: "16px", backgroundColor: "red" }}/>
+                  <Typography variant="body1">Not yet cleaned</Typography>
+                </Stack>
+                <Typography variant="body1" ml="auto">{schedules.filter(s => s.status === "ASSIGNED").length / schedules.length * 100}%</Typography>
+              </Stack>
+              <Stack direction="row" alignContent="space-between" width="100%">
+                <Stack direction="row" spacing={1} alignItems="center">
+                  <Box sx={{width: "16px", height: "16px", borderRadius: "16px", backgroundColor: "green" }}/>
+                  <Typography variant="body1">Cleaned</Typography>
+                </Stack>
+                <Typography variant="body1" ml="auto">{schedules.filter(s => s.status === "COMPLETED").length / schedules.length * 100}%</Typography>
+              </Stack>
+            </Stack>
+          </>
+        )
+      }
     </Container>
   )
 }
