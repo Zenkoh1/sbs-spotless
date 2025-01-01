@@ -6,6 +6,7 @@ import ChecklistItem from "../../types/ChecklistItem.type";
 import Checklist from "../../types/Checklist.type";
 import { Add, ArrowDownward, ArrowUpward, Delete } from "@mui/icons-material";
 import { getImagePreview } from "../../util/imageHelper";
+import { format } from "date-fns";
 
 const ViewChecklist = () => {
   const { id } = useParams<{ id: string }>();
@@ -82,7 +83,7 @@ const ViewChecklist = () => {
 
   return (
     <Container>
-      <Box>
+      <Box textAlign="start">
         <Typography variant="h4">{checklist.title}</Typography>
         <Typography variant="body1">{checklist.description}</Typography>
       </Box>
@@ -92,6 +93,9 @@ const ViewChecklist = () => {
         handleDecreaseOrder={handleDecreaseOrder} 
         handleDeleteItem={handleDeleteItem}
       />
+      <Typography variant="body2" mt={2}>
+        Last updated: {checklistSteps.length > 0 ? format(checklistSteps.map(s => s.updated_at).sort().reverse()[0] || new Date(), "yyyy-MM-dd HH:mm").toString() : "never"}
+      </Typography>
       <Fab color="primary" aria-label="add" sx={{ position: 'fixed', bottom: 16, right: 80 }} onClick={() => setCreateModalIsOpen(true)}>
         <Add />
       </Fab>
@@ -123,26 +127,32 @@ const ChecklistTable = ({ checklistSteps, handleIncreaseOrder, handleDecreaseOrd
       <MUITable>
         <TableHead>
           <TableRow>
-            <TableCell sx={{width:"5%"}}>Order</TableCell>
             <TableCell>Title</TableCell>
-            <TableCell>Content</TableCell>
+            <TableCell sx={{ maxWidth: "300px"}}>Content</TableCell>
             <TableCell>Image required?</TableCell>
-            <TableCell sx={{width:"20%"}}>Action</TableCell>
+            <TableCell sx={{width:"150px"}}>Action</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {checklistSteps.sort((a, b) => a.order - b.order).map((step, index) => (
             <TableRow key={index}>
-              <TableCell sx={{width:"5%"}}>{step.order}</TableCell>
               <TableCell>{step.title}</TableCell>
-              <TableCell>
+              <TableCell sx={{ maxWidth: "300px"}}>
                 <Typography variant="body2">{step.description}</Typography>
-                <img src={getImagePreview(step.image)} alt={step.title} style={{ width: 100, height: 100 }} />
+                {
+                  getImagePreview(step.image).slice(7) ? (
+                    <Button variant="outlined" onClick={() => window.open(getImagePreview(step.image), "_blank")} sx={{ marginTop: "8px"}}>
+                      View Image
+                    </Button>
+                  ) : (
+                    <Typography variant="body2">No image uploaded</Typography>
+                  )
+                }
               </TableCell>
               <TableCell>
                 <Checkbox checked={step.is_image_required} />
               </TableCell>
-              <TableCell sx={{width:"20%"}}>
+              <TableCell sx={{width:"150px"}}>
                 <IconButton onClick={() => handleDecreaseOrder(step.id)}>
                   <ArrowUpward />
                 </IconButton>
@@ -188,9 +198,9 @@ const ChecklistItemForm = ({
     <Dialog onClose={onClose} open={open}>
       <DialogTitle>Create Checklist Item</DialogTitle>
       <DialogContent>
-        {formState.image && <img src={getImagePreview(formState.image)} alt="checklist item" style={{ width: "100%" }} />}
+        {formState.image && <img src={getImagePreview(formState.image)} alt="checklist item"  style={{ width: "80%", marginLeft: "10%", marginBottom: "16px"}} />}
         {!formState.image && (
-          <Button variant="contained" component="label">
+          <Button variant="outlined" component="label" fullWidth>
             Upload Image
             <input 
               type="file" 
@@ -214,13 +224,15 @@ const ChecklistItemForm = ({
           value={formState.description}
           onChange={handleChange("description")}
         />
-        <Typography>
-          Is image required?
-        </Typography>
-        <Checkbox
-          checked={formState.is_image_required}
-          onChange={(event) => setFormState({ ...formState, is_image_required: event.target.checked })}
-        />
+        <Stack direction={"row"} spacing={2} sx={{ alignItems: "center"}}>
+          <Typography variant="body1">
+            Require image to be uploaded during checking:
+          </Typography>
+          <Checkbox
+            checked={formState.is_image_required}
+            onChange={(event) => setFormState({ ...formState, is_image_required: event.target.checked })}
+          />
+        </Stack>
         <Stack direction="row" spacing={2} mt={2}>
           <Button
             variant="contained"

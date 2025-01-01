@@ -1,10 +1,11 @@
 import { Box, Button, Dialog, DialogContent, DialogTitle, Fab, Stack, TextField, Typography } from "@mui/material";
 import { useState, useEffect } from "react";
 import Checklist from "../../types/Checklist.type";
-import { Add, Create } from "@mui/icons-material";
-import { retrieveAllChecklists, editChecklist, createChecklist, deleteChecklist } from "../../api/checklists";
+import { Add } from "@mui/icons-material";
+import { retrieveAllChecklists, createChecklist } from "../../api/checklists";
 import Table from "../../components/Table";
 import { useNavigate } from "react-router-dom";
+import { format } from "date-fns";
 
 const COLUMNS: { key: keyof Checklist; label: string; sortable?: boolean }[] = [
   { key: "id", label: "ID", sortable: false },
@@ -41,6 +42,9 @@ const AllChecklists = () => {
         data={checklists}
         onRowClick={(row) => navigate(`/checklists/${row.id}`)}
       />
+      <Typography variant="body2" mt={2}>
+        Last updated: {checklists.length > 0 ? format(checklists.map(c => c.updated_at).sort().reverse()[0] || new Date(), "yyyy-MM-dd HH:mm").toString() : "never"}
+      </Typography>
       <CreateChecklistModal
         isOpen={createModalOpen}
         onSave={handleSave}

@@ -1,4 +1,4 @@
-import { Box, Dialog, DialogContent, DialogTitle, Typography } from "@mui/material";
+import { Box, Dialog, DialogContent, DialogTitle, Rating, Stack, Typography } from "@mui/material";
 import Table from "../../components/Table";
 import Survey from "../../types/Survey.type";
 import { useEffect, useState } from "react";
@@ -35,7 +35,7 @@ const AllSurveys = () => {
         data={surveyResults.map((survey) => {
           return {
             ...survey,
-            rating: `${survey.rating}/10`,
+            rating: survey.rating,
             bus: buses.find(b => b.id === survey.bus)?.number_plate
           }
         })}
@@ -68,26 +68,26 @@ const SurveyModal = ({
       <DialogTitle>Viewing Survey</DialogTitle>
       <DialogContent>
         <Typography variant="body1">
-          Bus: {buses.find(b => b.id === survey.bus)?.number_plate}
+          <strong>Bus:</strong> {buses.find(b => b.id === survey.bus)?.number_plate}
+        </Typography>
+        <Stack direction="row" spacing={1} alignItems="center">
+          <strong>Rating:</strong> <Rating value={survey.rating} readOnly />
+        </Stack>
+        <Typography variant="body1">
+          <strong>Comment:</strong> {survey.comment}
         </Typography>
         <Typography variant="body1">
-          Rating: {survey.rating}/10
+          <strong>Submitted At:</strong> {format(survey.created_at, "yyyy-MM-dd HH:mm")}
         </Typography>
-        <Typography variant="body1">
-          Comment: {survey.comment}
-        </Typography>
-        <Typography variant="body1">
-          Created At: {format(survey.created_at, "yyyy-MM-dd HH:mm")}
-        </Typography>
-        <Box mt={2}>
-          <Typography variant="h6">Images</Typography>
+        <Typography variant="h6" mb={2} mt={2}>Attached Images</Typography>
+        <Stack direction="column" spacing={1} alignItems="center">
           {survey.images.map((surveyImage, index) => (
-            <img key={index} src={surveyImage.image} alt={`Survey ${index}`} style={{ width: "100%" }} />
+            <img key={index} src={surveyImage.image} alt={`Survey ${index}`} style={{ width: "80%" }} />
           ))}
           {survey.images.length === 0 && (
             <Typography variant="body1">No images</Typography>
           )}
-        </Box>
+        </Stack>
       </DialogContent>
     </Dialog>
   )

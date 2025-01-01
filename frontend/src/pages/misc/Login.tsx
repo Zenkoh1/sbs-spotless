@@ -33,7 +33,8 @@ const Loginpage = () => {
   return (
     <Box width="50vw" display="inline-block">
       <form autoComplete="off" onSubmit={handleSubmit}>
-        <h2>Login Form</h2>
+        <img src="/sbs-transit-vector-logo.svg" alt="SBS Logo" style={{ width: "300px" }}/>
+        <h2>Login to Operator Dashboard</h2>
         <FormTextField
           input={email}
           setInput={setEmail}

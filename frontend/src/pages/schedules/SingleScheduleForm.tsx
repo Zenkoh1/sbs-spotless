@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { format } from "date-fns";
 import { ScheduleSingle } from "../../api/schedules";
 import Bus from "../../types/Bus.type";
-import { DateTimePicker, TimePicker } from "@mui/x-date-pickers";
+import { TimePicker } from "@mui/x-date-pickers";
 import Checklist from "../../types/Checklist.type";
 import User from "../../types/User.type";
 
@@ -45,7 +45,7 @@ const SingleScheduleForm = ({
             d.setMinutes((time || new Date()).getMinutes());
             setFormState({ ...formState, datetime: d });
           }}
-          sx={{ width: "100%" }}
+          sx={{ width: "100%", mt: "8px" }}
         />
 
         <Autocomplete
@@ -55,6 +55,7 @@ const SingleScheduleForm = ({
           value={cleaners.filter(cleaner => formState.cleaners.includes(cleaner.id))}
           onChange={(_, value) => setFormState({ ...formState, cleaners: value.map(cleaner => cleaner.id) })}
           renderInput={(params) => <TextField {...params} label="Cleaners" />}
+          sx={{ mt: "8px" }}
         />
 
         <Autocomplete
@@ -63,6 +64,7 @@ const SingleScheduleForm = ({
           value={cleaningChecklists.find(checklist => checklist.id === formState.cleaning_checklist) || null}
           onChange={(_, value) => setFormState({ ...formState, cleaning_checklist: value ? value.id : 0 })}
           renderInput={(params) => <TextField {...params} label="Cleaning Checklist" />}
+          sx={{ mt: "8px" }}
         />
 
         <Stack direction="row" spacing={2} mt={2}>

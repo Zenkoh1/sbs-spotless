@@ -48,7 +48,16 @@ function App() {
   }, [isAuth]);
 
   // Should be in a separate file if you want to really customize the theme
-  let theme = createTheme();
+  let theme = createTheme({
+    palette: {
+      primary: {
+        main: "#4c66ff",
+      },
+      secondary: {
+        main: "#ff3366",
+      }
+    },
+  });
   theme = responsiveFontSizes(theme);
 
   if (loading) {

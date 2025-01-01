@@ -1,7 +1,7 @@
 import { Box, Button, Dialog, DialogContent, DialogTitle, Fab, Stack, TextField } from "@mui/material";
 import { useState, useEffect } from "react";
 import UserType from "../../types/User.type";
-import { Add } from "@mui/icons-material";
+import { Add, UploadFile } from "@mui/icons-material";
 import { getCleaners, registerCleaner } from "../../api/cleaners";
 import Table from "../../components/Table";
 
@@ -58,13 +58,22 @@ const AllCleaners = () => {
         sx={{
           position: "fixed",
           bottom: 16,
-          right: 16,
+          right: 80,
         }}
         onClick={() => {
           setCreateModalOpen(true);
         }}
       >
         <Add />
+      </Fab>
+      <Fab color="primary" aria-label="upload" sx={{ position: 'fixed', bottom: 16, right: 16 }} component="label">
+        <UploadFile />
+        <input
+          type="file"
+          hidden
+          accept="image/*"
+          onChange={(e) => console.log("Attempt to upload csv file")}
+        />
       </Fab>
     </Box>
   );
