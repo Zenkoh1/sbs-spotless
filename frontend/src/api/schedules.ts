@@ -79,7 +79,7 @@ export function createMassSchedule(
   schedule: ScheduleMass
 ): Promise<Schedule[]> {
   return axios
-    .post(`${BACKEND_URL}cleaning_schedules/mass_create`, schedule, {
+    .post(`${BACKEND_URL}cleaning_schedules/mass_create/`, schedule, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
       },
