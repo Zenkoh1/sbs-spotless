@@ -1,9 +1,27 @@
-import { AppBar, Toolbar, Typography, Box, IconButton, Avatar, Stack } from "@mui/material";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Box,
+  IconButton,
+  Avatar,
+  Stack,
+} from "@mui/material";
 import { getName, logoutUser } from "../api/sessionManager";
 import { useContext } from "react";
 import { AuthContext } from "../App";
 import { NavLink, useLocation } from "react-router-dom";
-import { Checklist, CleaningServices, QuestionMark, DirectionsBus, Commute, Schedule, Logout, Home } from "@mui/icons-material";
+import {
+  Checklist,
+  CleaningServices,
+  QuestionMark,
+  DirectionsBus,
+  Commute,
+  Schedule,
+  Logout,
+  Home,
+  Dashboard,
+} from "@mui/icons-material";
 
 const NAV_ITEMS = [
   { label: "Home", icon: <Home />, path: "/" },
@@ -13,7 +31,8 @@ const NAV_ITEMS = [
   { label: "Cleaners", icon: <CleaningServices />, path: "/cleaners" },
   { label: "Schedules", icon: <Schedule />, path: "/schedules" },
   { label: "Survey", icon: <QuestionMark />, path: "/survey" },
-]
+  { label: "Dashboard", icon: <Dashboard />, path: "/dashboard" },
+];
 
 const Navbar = () => {
   return (
@@ -39,7 +58,14 @@ const Navbar = () => {
           Spotless
         </Typography>
 
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 1, width: "100%" }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 1,
+            width: "100%",
+          }}
+        >
           {NAV_ITEMS.map((item, index) => (
             <NavLink
               key={index}
@@ -62,16 +88,14 @@ const Navbar = () => {
               >
                 {item.icon}
               </IconButton>
-              <Typography variant="body1">
-                {item.label}
-              </Typography>
+              <Typography variant="body1">{item.label}</Typography>
             </NavLink>
           ))}
         </Box>
       </Toolbar>
     </AppBar>
   );
-}
+};
 
 const Topbar = () => {
   const { setIsAuth } = useContext(AuthContext);
@@ -95,16 +119,20 @@ const Topbar = () => {
           alignItems: "center",
         }}
       >
-        { location.pathname === "/" ? (
+        {location.pathname === "/" ? (
           <Typography variant="h4" ml="8px" sx={{ fontWeight: "bold" }}>
             Home
           </Typography>
-          ) : (
+        ) : (
           <Typography variant="h4" ml="8px" sx={{ fontWeight: "bold" }}>
-            { NAV_ITEMS.filter(item => item.path !== "/").find(item => location.pathname.startsWith(item.path))?.label}
+            {
+              NAV_ITEMS.filter((item) => item.path !== "/").find((item) =>
+                location.pathname.startsWith(item.path)
+              )?.label
+            }
           </Typography>
         )}
-        
+
         <Stack direction="row" spacing={2}>
           <IconButton
             onClick={() => {
@@ -117,14 +145,12 @@ const Topbar = () => {
           >
             <Logout />
           </IconButton>
-          <Avatar>
-            {getName().charAt(0)}
-          </Avatar>
+          <Avatar>{getName().charAt(0)}</Avatar>
         </Stack>
       </Toolbar>
     </AppBar>
   );
-}
+};
 
 const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -142,7 +168,7 @@ const Layout = ({ children }: { children: React.ReactNode }) => {
         {children}
       </Box>
     </>
-  )
-}
+  );
+};
 
 export default Layout;
