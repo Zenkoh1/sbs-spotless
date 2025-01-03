@@ -31,7 +31,7 @@ const NAV_ITEMS = [
   { label: "Cleaners", icon: <CleaningServices />, path: "/cleaners" },
   { label: "Schedules", icon: <Schedule />, path: "/schedules" },
   { label: "Survey", icon: <QuestionMark />, path: "/survey" },
-  { label: "Dashboard", icon: <Dashboard />, path: "/dashboard" },
+  { label: "Analytics", icon: <Dashboard />, path: "/dashboard" },
 ];
 
 const Navbar = () => {

@@ -206,14 +206,14 @@ const PieChart = ({ schedules } : { schedules : Schedule[] }) => {
                   <Box sx={{width: "16px", height: "16px", borderRadius: "16px", backgroundColor: "red" }}/>
                   <Typography variant="body1">Not yet cleaned</Typography>
                 </Stack>
-                <Typography variant="body1" ml="auto">{schedules.filter(s => s.status === "ASSIGNED").length / schedules.length * 100}%</Typography>
+                <Typography variant="body1" ml="auto">{Math.round(schedules.filter(s => s.status === "ASSIGNED").length / schedules.length * 100)}%</Typography>
               </Stack>
               <Stack direction="row" alignContent="space-between" width="100%">
                 <Stack direction="row" spacing={1} alignItems="center">
                   <Box sx={{width: "16px", height: "16px", borderRadius: "16px", backgroundColor: "green" }}/>
                   <Typography variant="body1">Cleaned</Typography>
                 </Stack>
-                <Typography variant="body1" ml="auto">{schedules.filter(s => s.status === "COMPLETED").length / schedules.length * 100}%</Typography>
+                <Typography variant="body1" ml="auto">{Math.round(schedules.filter(s => s.status === "COMPLETED").length / schedules.length * 100)}%</Typography>
               </Stack>
             </Stack>
           </>
