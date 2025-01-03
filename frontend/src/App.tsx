@@ -20,6 +20,7 @@ import MassSchedule from "./pages/schedules/MassSchedule";
 import NotFound from "./pages/misc/NotFound";
 import ViewSchedule from "./pages/schedules/ViewSchedule";
 import AllSurveys from "./pages/survey/AllSurveys";
+import Dashboard from "./pages/dashboard/Dashboard";
 
 type AuthContextType = {
   isAuth: boolean;
@@ -55,7 +56,7 @@ function App() {
       },
       secondary: {
         main: "#ff3366",
-      }
+      },
     },
   });
   theme = responsiveFontSizes(theme);
@@ -109,7 +110,7 @@ function App() {
                   />
 
                   <Route path="/survey" element={<AllSurveys />} />
-
+                  <Route path="/dashboard" element={<Dashboard />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </Layout>
