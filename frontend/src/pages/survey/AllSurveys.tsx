@@ -62,6 +62,7 @@ const SurveyModal = ({
   buses: Bus[],
   open: boolean
 }) => {
+  console.log(survey)
   if (!open) return null;
   return (
     <Dialog onClose={onClose} open={open}>

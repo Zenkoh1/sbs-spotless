@@ -209,7 +209,7 @@ const ModalContent = (props: {
                     <Box
                       key={idx}
                       component="img"
-                      src={image.image}
+                      src={"http://localhost:8080/" + image.image}
                       alt="survey"
                       sx={{
                         width: 100,
@@ -311,7 +311,7 @@ export default function Checklistpage() {
         }
       );
       const updateSurveyResponse = await axios.patch(
-        `${BACKEND_URL?.replace("api/mobile", "spotless_survey_api")}survey/${schedule?.bus.id}/resolve_all_survey_by_bus`,
+        `${BACKEND_URL?.replace("api/mobile", "spotless_survey_api")}survey/${schedule?.bus.id}/resolve_all_survey_by_bus/`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("access_token")}`,

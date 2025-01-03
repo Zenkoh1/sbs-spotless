@@ -15,6 +15,7 @@ import Checklist from "../../types/Checklist.type";
 import { retrieveAllChecklists } from "../../api/checklists";
 import { retrieveAllCleaners } from "../../api/staff";
 import User from "../../types/User.type";
+import { BACKEND_URL } from "../../constants";
 
 const ViewSchedule = () => {
   const { id } = useParams<{ id: string }>();
@@ -33,6 +34,7 @@ const ViewSchedule = () => {
         retrieveAllChecklistStepsByScheduleId(parseInt(id!))
           .then((result) => {
             setSteps(result);
+            console.log(result)
           })
           .catch((error) => console.error(error));
       });
@@ -58,10 +60,11 @@ const ViewSchedule = () => {
       <Stack spacing={2} mt={2}>
         {steps.map((step) => (
           <Card component={Paper} sx={{padding: "16px"}}>
-            <Typography variant="h6">{step.cleaning_checklist_item.title}</Typography>
-            {step.images.map(image => 
-              <img src={getImagePreview(image.image)} />
-            )}
+            <Typography variant="h6" gutterBottom>{step.cleaning_checklist_item.title}</Typography>
+            { step.images.length > 0 && (
+              <img src={getImagePreview('http://localhost:8080/' + step.images[0].image)} style={{ maxWidth: "300px"}}/>
+              )
+            }
           </Card>
         ))}
       </Stack>
